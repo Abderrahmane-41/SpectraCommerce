@@ -37,6 +37,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'poppins': ['Poppins', 'sans-serif'],
+				'tajawal': ['Tajawal', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

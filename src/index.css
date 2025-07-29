@@ -2,6 +2,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap');
+
 
 @layer base {
   :root {
@@ -97,7 +99,7 @@
 
   body {
     @apply bg-gradient-light dark:bg-gradient-dark text-foreground font-poppins px-0 sm:px-6 lg:px-8;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Tajawal', sans-serif;
     width: 100%;
     overflow-x: hidden;
     min-height: 100vh;
