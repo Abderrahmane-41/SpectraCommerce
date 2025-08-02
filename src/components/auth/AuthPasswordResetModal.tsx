@@ -118,59 +118,58 @@ const AuthPasswordResetModal = ({ isOpen, onClose }: AuthPasswordResetModalProps
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md relative p-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-primary dark:bg-gradient-primary-dark"></div>
-        <div className="relative z-10 p-px bg-background m-[2px] rounded-lg">
-          <div className="p-5 sm:p-6">
+      <DialogContent className="sm:max-w-md">
+        <div className="p-[2px] rounded-lg bg-gradient-primary dark:bg-gradient-primary-dark">
+          <div className="bg-background rounded-lg p-6">
             <DialogHeader>
               <DialogTitle>إعادة تعيين كلمة المرور</DialogTitle>
-          <DialogDescription>
-            أدخل عنوان بريدك الإلكتروني المسجل لتلقي رابط إعادة تعيين كلمة المرور.
-          </DialogDescription>
-        </DialogHeader>
+              <DialogDescription>
+                أدخل عنوان بريدك الإلكتروني المسجل لتلقي رابط إعادة تعيين كلمة المرور.
+              </DialogDescription>
+            </DialogHeader>
 
-        {message && (
-          <Alert>
-            <AlertDescription className="text-green-600">
-              {message}
-            </AlertDescription>
-          </Alert>
-        )}
+            {message && (
+              <Alert>
+                <AlertDescription className="text-green-600">
+                  {message}
+                </AlertDescription>
+              </Alert>
+            )}
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-        <form onSubmit={handleSendResetLink} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">عنوان البريد الإلكتروني</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="أدخل بريدك الإلكتروني المسجل"
-                className="pl-10"
-                required
-                disabled={isLoading}
-              />
-            </div>
+            <form onSubmit={handleSendResetLink} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">عنوان البريد الإلكتروني</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="أدخل بريدك الإلكتروني المسجل"
+                    className="pl-10"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="submit" disabled={isLoading} className="flex-1">
+                  {isLoading ? 'جارٍ الإرسال...' : 'إرسال رابط إعادة التعيين'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
+                  إلغاء
+                </Button>
+              </div>
+            </form>
           </div>
-
-          <div className="flex gap-2">
-            <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'جارٍ الإرسال...' : 'إرسال رابط إعادة التعيين'}
-            </Button>
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
-              إلغاء
-            </Button>
-          </div>
-        </form>
-        </div>
         </div>
       </DialogContent>
     </Dialog>
