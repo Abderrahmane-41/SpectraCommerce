@@ -23,7 +23,6 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  detailed_description?: string;
   base_price: number;
   price_before_discount?: number | null;
   images: string[];
@@ -33,6 +32,7 @@ export interface Product {
     colors: Array<{ name: string; priceModifier: number }>;
   };
   quantity_offers?: Array<{ quantity: number; price: number }>; // Add this line
+  description_content?: Array<{ type: 'text' | 'image'; content: string }> | null;
 
 }
 
@@ -221,7 +221,10 @@ export const useProducts = (typeId: string) => {
           : { sizes: [], colors: [] },
         quantity_offers: Array.isArray(product.quantity_offers) 
           ? product.quantity_offers as Array<{ quantity: number; price: number }>
-          : undefined
+          : undefined,
+        description_content: Array.isArray(product.description_content)
+          ? product.description_content as Array<{ type: 'text' | 'image'; content: string }>
+          : null
       }));
       setProducts(transformedProducts);
     }
@@ -234,13 +237,13 @@ export const useProducts = (typeId: string) => {
       .insert([{
         name: product.name,
         description: product.description,
-        detailed_description: product.detailed_description,
         base_price: product.base_price,
         price_before_discount: product.price_before_discount,
         images: product.images,
         product_type_id: product.product_type_id,
         options: product.options,
-        quantity_offers: product.quantity_offers // ADDED THIS LINE
+        quantity_offers: product.quantity_offers ,// ADDED THIS LINE
+        description_content: product.description_content
 
 
       }])
@@ -259,7 +262,11 @@ export const useProducts = (typeId: string) => {
   const updateProduct = async (id: string, updates: Partial<Omit<Product, 'id'>>) => {
     const { error } = await supabase
       .from('products')
-      .update(updates)
+      .update({
+      ...updates,
+      // Ensure description_content is properly handled
+      description_content: updates.description_content
+    })
       .eq('id', id);
     
     if (error) {

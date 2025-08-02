@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
-import { toast } from 'sonner';
 
 export interface Review {
   id: string;
@@ -16,7 +15,6 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  detailed_description?: string;
   base_price: number;
   price_before_discount?: number | null;
   image_url?: string;
@@ -29,6 +27,7 @@ export interface Product {
     colors: Array<{ name: string; priceModifier: number }>;
   };
   quantity_offers?: Array<{ quantity: number; price: number }>; // Add this line
+  description_content?: Array<{ type: 'text' | 'image'; content: string }> | null;
 
 }
 
@@ -74,6 +73,22 @@ export const useProductById = (productId: string) => {
         ? data.options as { sizes?: Array<{ name: string; priceModifier: number }>; colors?: Array<{ name: string; priceModifier: number }> }
         : { sizes: [], colors: [] };
 
+      // Process description content before setting it
+      let parsedDescriptionContent = null;
+      if (data.description_content) {
+        if (Array.isArray(data.description_content)) {
+          parsedDescriptionContent = data.description_content;
+        } else if (typeof data.description_content === 'string') {
+          try {
+            parsedDescriptionContent = JSON.parse(data.description_content);
+          } catch (error) {
+            console.error('Error parsing description_content:', error);
+          }
+        } else {
+          parsedDescriptionContent = data.description_content;
+        }
+      }
+
       const transformedProduct: Product = {
         ...data,
         image_url: data.images?.[0] || null,
@@ -86,7 +101,8 @@ export const useProductById = (productId: string) => {
         quantity_offers: data.quantity_offers ? 
           (typeof data.quantity_offers === 'string' ? 
             JSON.parse(data.quantity_offers) : data.quantity_offers) as Array<{ quantity: number; price: number }> : 
-          undefined
+          undefined,
+        description_content: parsedDescriptionContent
       };
       setProduct(transformedProduct);
     }

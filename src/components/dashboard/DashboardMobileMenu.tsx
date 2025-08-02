@@ -16,7 +16,7 @@ interface DashboardMobileMenuProps {
 
 const menuVariants = {
   hidden: {
-    x: '-100%',
+    x: '100%',
     transition: {
       type: "spring" as const,
       stiffness: 300,
@@ -119,7 +119,7 @@ const DashboardMobileMenu = ({ isOpen, setIsOpen, onLogout, onPasswordReset, set
           onClick={() => setIsOpen(false)}
         >
           <motion.div
-            className="fixed top-0 left-0 h-full w-46 bg-background/95 backdrop-blur-lg shadow-2xl p-6 flex flex-col"
+            className="fixed top-0 right-0 h-full w-46 bg-background/95 backdrop-blur-lg shadow-2xl p-6 flex flex-col"
             variants={menuVariants}
             initial="hidden"
             animate="visible"

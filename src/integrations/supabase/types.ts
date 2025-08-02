@@ -96,7 +96,6 @@ export type Database = {
           created_at: string | null
           price_before_discount: number | null
           description: string | null
-          detailed_description?: string
           id: string
           images: string[] | null
           name: string
@@ -104,12 +103,12 @@ export type Database = {
           product_type_id: string | null
           updated_at: string | null
           quantity_offers: Json | null
+          description_content?: Json | null
         }
         Insert: {
           base_price: number
           created_at?: string | null
           description?: string | null
-          detailed_description?: string
           id?: string
           images?: string[] | null
           name: string
@@ -118,12 +117,12 @@ export type Database = {
           price_before_discount?: number | null
           updated_at?: string | null
           quantity_offers?: Json | null
+          description_content?: Json | null
         }
         Update: {
           base_price?: number
           created_at?: string | null
           description?: string | null
-          detailed_description?: string
           id?: string
           images?: string[] | null
           name?: string
@@ -131,6 +130,7 @@ export type Database = {
           product_type_id?: string | null
           updated_at?: string | null
           quantity_offers?: Json | null
+          description_content?: Json | null
         }
         Relationships: [
           {

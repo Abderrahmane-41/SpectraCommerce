@@ -1,16 +1,26 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Edit,DollarSign } from 'lucide-react';
+import { X, Plus, Trash2,Upload, Edit } from 'lucide-react';
 import { useProducts, useProductTypes } from '../../hooks/useSupabaseStore';
 import ImageUpload from '../ImageUpload';
 import { toast } from 'sonner';
 import ProductOptionModal from './ProductOptionModal'; // <-- Import the new modal
+import { useImageUpload } from "@/hooks/useImageUpload"; // Make sure to import this
+import { Textarea } from '../ui/textarea';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 
 
 interface ProductOption {
   name: string;
   priceModifier: number;
 }
+
+type ContentBlock = {
+  type: 'text' | 'image';
+  content: string;
+};
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -26,7 +36,6 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
   
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
-  const [detailedDescription, setDetailedDescription] = useState('');
   const [basePrice, setBasePrice] = useState('');
   const [priceBeforeDiscount, setPriceBeforeDiscount] = useState('');
   const [productTypeId, setProductTypeId] = useState(selectedTypeId);
@@ -35,6 +44,9 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
   const [colors, setColors] = useState<ProductOption[]>([]);
 
   const [quantityOffers, setQuantityOffers] = useState<Array<{ quantity: string; price: string }>>([]);
+
+  const [descriptionBlocks, setDescriptionBlocks] = useState<ContentBlock[]>([]);
+  const { uploadImage, uploading } = useImageUpload(); // Use your existing image upload hook
 
 
   // State for the new options modal
@@ -46,7 +58,6 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
     if (editingProduct) {
       setProductName(editingProduct.name || '');
       setDescription(editingProduct.description || '');
-      setDetailedDescription(editingProduct.detailed_description || '');
       setBasePrice(editingProduct.base_price?.toString() || '');
       setPriceBeforeDiscount(editingProduct.price_before_discount?.toString() || '');
       setProductTypeId(editingProduct.product_type_id || selectedTypeId);
@@ -60,9 +71,17 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
       price: o.price.toString(),
     })) || []
   );
+// Fix description content initialization
+        if (editingProduct.description_content && Array.isArray(editingProduct.description_content)) {
+          setDescriptionBlocks(editingProduct.description_content);
+        } else {
+          setDescriptionBlocks([]);
+        }
+
     } else {
       resetForm();
       setQuantityOffers([]);
+      setDescriptionBlocks([]); // Add this
 
     }
   }, [editingProduct, selectedTypeId]);
@@ -70,7 +89,6 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
   const resetForm = () => {
     setProductName('');
     setDescription('');
-    setDetailedDescription('');
     setBasePrice('');
     setPriceBeforeDiscount('');
     setProductTypeId(selectedTypeId);
@@ -78,8 +96,54 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
     setSizes([]);
     setColors([]);
     setQuantityOffers([]);
+    setDescriptionBlocks([]); // Add this line
+
 
   };
+
+
+  // In src/components/dashboard/AddProductModal.tsx
+
+const addTextBlock = () => {
+  setDescriptionBlocks([...descriptionBlocks, { type: 'text', content: '' }]);
+};
+
+const handleDescriptionImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files && e.target.files[0]) {
+    try {
+      const result = await uploadImage(e.target.files[0]);
+      
+      // Check if upload was successful and extract the imageUrl
+      if (result.success && result.imageUrl) {
+        setDescriptionBlocks([...descriptionBlocks, { 
+          type: 'image', 
+          content: result.imageUrl  // Use result.imageUrl instead of result
+        }]);
+        toast.success('تم إضافة الصورة للوصف!');
+      } else {
+        throw new Error(result.error || 'فشل في رفع الصورة');
+      }
+    } catch (error) {
+      toast.error('فشل رفع الصورة. يرجى المحاولة مرة أخرى.');
+      console.error('Upload error:', error);
+    }
+  }
+};
+
+      // Use the same upload method as product images
+     
+
+const handleBlockChange = (index: number, newContent: string) => {
+  const updatedBlocks = [...descriptionBlocks];
+  updatedBlocks[index].content = newContent;
+  setDescriptionBlocks(updatedBlocks);
+};
+
+const removeBlock = (index: number) => {
+  setDescriptionBlocks(descriptionBlocks.filter((_, i) => i !== index));
+};
+
+// Update your onSubmit function
 
   // Locate this function
 const handleOfferChange = (index: number, field: 'quantity' | 'price', value: string) => {
@@ -182,17 +246,21 @@ const handleSubmit = async (e: React.FormEvent) => {
                 quantity: parseInt(o.quantity, 10), // Quantity is always an integer
                 price: formatPriceForDb(o.price) || 0 // Use the helper for price
             }));
+   // Filter out empty description blocks
+    const filteredDescriptionBlocks = descriptionBlocks
+      .filter(block => block.content && block.content.trim() !== '');
 
         const productData = {
             name: productName.trim(),
             description: description.trim(),
-            detailed_description: detailedDescription.trim(),
             base_price: formatPriceForDb(basePrice) || 0, // Apply helper
             price_before_discount: formatPriceForDb(priceBeforeDiscount), // Apply helper
             product_type_id: productTypeId,
             images: images.length > 0 ? images : ['/placeholder.svg'],
             options: { sizes, colors },
-            quantity_offers: formattedQuantityOffers
+            quantity_offers: formattedQuantityOffers,
+            description_content: filteredDescriptionBlocks.length > 0 ? filteredDescriptionBlocks : null
+
         };
 
         console.log("Submitting product data:", productData); // Debug log
@@ -325,7 +393,93 @@ const handleSubmit = async (e: React.FormEvent) => {
           
           <div>
               <label className="block text-sm font-medium mb-2">وصف تفصيلي للمنتج</label>
-              <textarea value={detailedDescription} onChange={(e) => setDetailedDescription(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="وصف تفصيلي للمنتج يظهر في صفحة المنتج..." rows={5} />
+              {/* Inside the form in AddProductModal.tsx */}
+
+
+          {/* Add content buttons */}
+          <div className="flex gap-2 mb-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addTextBlock}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              إضافة نص
+            </Button>
+            
+            <Label
+              htmlFor="description-image-upload"
+              className={`inline-flex items-center px-3 py-1 border border-border rounded-md cursor-pointer hover:bg-muted text-sm transition-all duration-200 ${
+                uploading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {uploading ? (
+                <>
+                  <div className="w-4 h-4 mr-1 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                 ... جارٍ الرفع
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-1" />
+                  إضافة صورة
+                </>
+              )}
+            </Label>
+            
+            <Input
+              id="description-image-upload"
+              type="file"
+              className="hidden"
+              onChange={handleDescriptionImageUpload}
+              disabled={uploading}
+              accept="image/*"
+            />
+          </div>
+
+          {/* Render description blocks */}
+          <div className="space-y-3">
+            {descriptionBlocks.map((block, index) => (
+              <div key={index} className="flex items-start gap-2 p-3 border border-border rounded-lg">
+                {block.type === 'text' ? (
+                  <Textarea
+                    className="flex-grow min-h-[80px]"
+                    placeholder=" ...اكتب وصف المنتج"
+                    value={block.content}
+                    onChange={(e) => handleBlockChange(index, e.target.value)}
+                  />
+                ) : (
+                  <div className="flex-grow">
+                    <img
+                      src={block.content}
+                      alt={`محتوى ${index + 1}`}
+                      className="w-full max-w-xs h-32 object-cover rounded border"
+                    />
+                    
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => removeBlock(index)}
+                  disabled={uploading}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {descriptionBlocks.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-border rounded-lg">
+            لا يوجد محتوى. اضغط على الأزرار أعلاه لإضافة نص أو صورة.
+          </div>
+        )}
+
+
+
+
           </div>
           
           <div>
@@ -341,7 +495,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           <div className="flex space-x-3 pt-4">
             <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted/50" disabled={loading}>إلغاء</button>
-            <button type="submit" className="flex-1 btn-gradient py-2 rounded-lg disabled:opacity-50" disabled={loading}>{loading ? 'جارٍ الحفظ...' : (editingProduct ? 'تحديث المنتج' : 'إضافة المنتج')}</button>
+            <button type="submit" className="flex-1 btn-gradient py-2 rounded-lg disabled:opacity-50" disabled={loading}>{loading ? ' ...جارٍ الحفظ' : (editingProduct ? 'تحديث المنتج' : 'إضافة المنتج')}</button>
           </div>
         </form>
       </motion.div>

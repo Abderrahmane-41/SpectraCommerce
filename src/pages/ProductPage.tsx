@@ -536,19 +536,39 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
           <span className="font-medium">اطلب الآن</span>
         </motion.button>
 
-        {product.detailed_description && (
-              <div className="mt-6">
-                <h3 className="text-lg font-bold mb-2">تفاصيل المنتج</h3>
-                <div className="relative p-[2px] w-full">
-                    <div className="absolute inset-0 rounded-lg bg-gradient-primary dark:bg-gradient-primary-dark opacity-30"></div>
-                  <div className="p-4 glass-effect rounded-lg relative z-10">
-                    <p className="text-base sm:text-lg text-foreground leading-relaxed whitespace-pre-line">
-                      {product.detailed_description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+           {/* Fix the description content display section */}
+        <div className="mt-8 lg:mt-12">
+          <h3 className="text-xl font-bold mb-4">تفاصيل المنتج</h3>
+          
+          {product.description_content && Array.isArray(product.description_content) && product.description_content.length > 0 && (
+            <div className="space-y-4">
+              {product.description_content.map((block: any, index: number) => {
+                if (block.type === 'text' && block.content && block.content.trim()) {
+                  return (
+                    <div key={index} className="prose prose-sm max-w-none">
+                      <p className="text-base text-foreground font-semibold leading-relaxed whitespace-pre-wrap">
+                        {block.content}
+                      </p>
+                    </div>
+                  );
+                }
+                if (block.type === 'image' && block.content) {
+                  return (
+                    <div key={index} className="my-4">
+                      <img 
+                        src={block.content} 
+                        alt={`تفاصيل المنتج ${index + 1}`} 
+                        className="w-full max-w-2xl mx-auto rounded-lg shadow-md object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          )}
+        </div>
 
         {reviews.length > 0 && (
           <motion.div className="mt-8 lg:mt-12" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>

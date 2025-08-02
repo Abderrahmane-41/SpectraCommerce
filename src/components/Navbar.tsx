@@ -36,8 +36,9 @@ const Navbar = ({children}: NavbarProps) => {
 
         <div className="flex items-center space-x-2 sm:space-x-4 px-0  mx-0 sm:mr-2">
           
-            {children}
+            
             <ThemeToggle />
+            {children}
         </div>
         
       </div>
