@@ -23,7 +23,7 @@ const AuthPage = () => {
   const [isPasswordResetOpen, setIsPasswordResetOpen] = useState(false);
   const [searchParams] = useSearchParams();
   
-  const { signIn, user, session } = useAuth();
+  const { signIn, user } = useAuth();
   const navigate = useNavigate();
 
   // Check if this is a password reset flow
@@ -112,6 +112,18 @@ const AuthPage = () => {
       if (error) throw error;
 
       toast.success('تم تحديث كلمة المرور بنجاح!');
+
+      // Clear the form
+      setPassword('');
+      setConfirmPassword('');
+      
+      // Sign out the user to clear the recovery session
+      await supabase.auth.signOut();
+      
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        navigate('/auth', { replace: true });
+      }, 1500);
     } catch (error: unknown) {
       console.error('Password reset error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';

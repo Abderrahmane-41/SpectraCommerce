@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Mail } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { getPasswordResetUrl } from '@/utils/url';
 
 interface AuthPasswordResetModalProps {
   isOpen: boolean;
@@ -87,7 +88,7 @@ const AuthPasswordResetModal = ({ isOpen, onClose }: AuthPasswordResetModalProps
 
       // If email exists, send reset link
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth?type=recovery`,
+        redirectTo: getPasswordResetUrl(),
       });
 
       if (error) {
