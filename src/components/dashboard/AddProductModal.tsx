@@ -33,6 +33,8 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
   const { addProduct, updateProduct } = useProducts('');
   const { productTypes } = useProductTypes();
   const [loading, setLoading] = useState(false);
+  const [minQuantity, setMinQuantity] = useState('1');
+  const [maxQuantity, setMaxQuantity] = useState('');
   
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
@@ -71,6 +73,8 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
       price: o.price.toString(),
     })) || []
   );
+        setMinQuantity(editingProduct.min_quantity?.toString() || '1');
+      setMaxQuantity(editingProduct.max_quantity?.toString() || '');
 // Fix description content initialization
         if (editingProduct.description_content && Array.isArray(editingProduct.description_content)) {
           setDescriptionBlocks(editingProduct.description_content);
@@ -82,6 +86,7 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
       resetForm();
       setQuantityOffers([]);
       setDescriptionBlocks([]); // Add this
+      
 
     }
   }, [editingProduct, selectedTypeId]);
@@ -97,6 +102,8 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
     setColors([]);
     setQuantityOffers([]);
     setDescriptionBlocks([]); // Add this line
+    setMinQuantity('1');
+    setMaxQuantity('');
 
 
   };
@@ -203,15 +210,47 @@ const removeOffer = (index: number) => {
   };
 
 
+  const preventScrollWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+  e.currentTarget.blur();
+  setTimeout(() => {
+    e.currentTarget.focus();
+  }, 0);
+};
+
   // Find the handleSubmit function in your AddProductModal component
 // Fix the handleSubmit function
 // Locate this function
 // Locate this function
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Get form data directly from the form elements
+  const formData = new FormData(e.target as HTMLFormElement);
+  const minQtyValue = ((e.target as HTMLFormElement).querySelector('input[name="minQuantity"]') as HTMLInputElement)?.value || '1';
+  const maxQtyValue = ((e.target as HTMLFormElement).querySelector('input[name="maxQuantity"]') as HTMLInputElement)?.value || '';
+  
+  console.log('Direct form minQuantity:', minQtyValue);
+  console.log('Direct form maxQuantity:', maxQtyValue);
     if (!productName.trim() || !basePrice || !productTypeId) {
         toast.error('الرجاء ملء جميع الحقول المطلوبة');
         return;
+    }
+    // Validate inventory
+    const minQty = parseInt(minQuantity, 10);
+    const maxQty = maxQuantity ? parseInt(maxQuantity, 10) : null;
+
+    console.log('Raw minQuantity input:', minQuantity);
+    console.log('Raw maxQuantity input:', maxQuantity);
+    console.log('Parsed minQty:', minQty);
+    console.log('Parsed maxQty:', maxQty);
+
+    if (isNaN(minQty) || minQty < 1) {
+      toast.error('الحد الأدنى للكمية يجب أن يكون رقم صحيح أكبر من 0');
+      return;
+    }
+
+    if (maxQty !== null && (isNaN(maxQty) || maxQty < minQty)) {
+      toast.error('الحد الأقصى للكمية يجب أن يكون أكبر من أو يساوي الحد الأدنى');
+      return;
     }
     setLoading(true);
 
@@ -259,7 +298,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             images: images.length > 0 ? images : ['/placeholder.svg'],
             options: { sizes, colors },
             quantity_offers: formattedQuantityOffers,
-            description_content: filteredDescriptionBlocks.length > 0 ? filteredDescriptionBlocks : null
+            description_content: filteredDescriptionBlocks.length > 0 ? filteredDescriptionBlocks : null,
+             min_quantity: minQty,
+        max_quantity: maxQty
 
         };
 
@@ -336,11 +377,11 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">السعر الحالي (دج) *</label>
-              <input type="number" value={basePrice} onChange={(e) => setBasePrice(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="2500" min="0" step="0.01" required />
+              <input type="number" value={basePrice} onChange={(e) => setBasePrice(e.target.value)} onWheel={preventScrollWheel}className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="2500" min="0" step="0.01" required />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">السعر قبل الخصم (اختياري)</label>
-              <input type="number" value={priceBeforeDiscount} onChange={(e) => setPriceBeforeDiscount(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="3000" min="0" step="0.01" />
+              <input type="number" value={priceBeforeDiscount} onChange={(e) => setPriceBeforeDiscount(e.target.value)} onWheel={preventScrollWheel} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="3000" min="0" step="0.01" />
             </div>
 
             <div>
@@ -360,6 +401,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                       type="number"
                       value={offer.price}
                       onChange={(e) => handleOfferChange(index, 'price', e.target.value)}
+                      onWheel={preventScrollWheel}
                       className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
                       placeholder="السعر الإجمالي"
                       step="0.01"
@@ -386,10 +428,44 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           </div>
 
+          {/* Inventory Management Section */}
+        <div className="grid grid-cols-2 gap-4">
           <div>
-              <label className="block text-sm font-medium mb-2">الوصف</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="وصف المنتج..." rows={3} />
+            <label className="block text-sm font-medium mb-2">الحد الأدنى للكمية *</label>
+            <input
+              type="number"
+              name="minQuantity"
+              value={minQuantity}
+              onChange={(e) => setMinQuantity(e.target.value)}
+              onWheel={preventScrollWheel}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="1"
+              min="1"
+              required
+            />
           </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">الحد الأقصى للكمية</label>
+            <input
+              type="number"
+              name="maxQuantity"
+              value={maxQuantity}
+              onChange={(e) => setMaxQuantity(e.target.value)}
+              onWheel={preventScrollWheel}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="اتركه فارغاً للكمية غير المحدودة"
+              min="1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              اتركه فارغاً إذا كنت تريد كمية غير محدودة
+            </p>
+          </div>
+        </div>
+
+            <div>
+                <label className="block text-sm font-medium mb-2">الوصف</label>
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="وصف المنتج..." rows={3} />
+            </div>
           
           <div>
               <label className="block text-sm font-medium mb-2">وصف تفصيلي للمنتج</label>

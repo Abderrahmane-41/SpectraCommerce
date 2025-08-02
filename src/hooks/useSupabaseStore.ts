@@ -33,6 +33,8 @@ export interface Product {
   };
   quantity_offers?: Array<{ quantity: number; price: number }>; // Add this line
   description_content?: Array<{ type: 'text' | 'image'; content: string }> | null;
+  min_quantity: number;
+  max_quantity: number | null;
 
 }
 
@@ -60,27 +62,82 @@ export const useOrders = () => {
       const transformedOrders: Order[] = (data || []).map(order => ({
         ...order,
         status: (order.status as   'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned') || 'pending',
-        product_id: (order as any).product_id || '', // Add default value for missing product_id
-        quantity: (order as any).quantity || 1 // Add default value for quantity
+        product_id: order.product_id || '', // Add default value for missing product_id
+        quantity: order.quantity || 1 // Add default value for quantity
       }));
       setOrders(transformedOrders);
     }
     setLoading(false);
   };
 
+    // Add function to update inventory when order status changes
+const updateProductInventory = async (productId: string, quantityChange: number) => {
+  const { data: product, error: fetchError } = await supabase
+    .from('products')
+    .select('max_quantity, min_quantity')
+    .eq('id', productId)
+    .single();
+
+  if (fetchError) {
+    console.error('Error fetching product for inventory update:', fetchError);
+    return false;
+  }
+
+  if (product.max_quantity === null) {
+    // Unlimited stock, no update needed
+    return true;
+  }
+
+  const newMaxQuantity = product.max_quantity + quantityChange;
+
+  if (newMaxQuantity < 0) {
+    console.error('Cannot reduce inventory below 0');
+    return false;
+  }
+  
+  const { error } = await supabase
+    .from('products')
+    .update({ 
+      max_quantity: newMaxQuantity,
+      min_quantity: product.min_quantity // Include the required min_quantity field
+    })
+    .eq('id', productId);
+
+  if (error) {
+    console.error('Error updating product inventory:', error);
+    return false;
+  }
+
+  return true;
+};
+
   const updateOrderStatus = async (orderId: string, status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned') => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status })
-      .eq('id', orderId);
-    
+    const { data: order, error: orderError } = await supabase
+    .from('orders')
+    .select('status, product_id, quantity')
+    .eq('id', orderId)
+    .single();
+    if (orderError) {
+    console.error('Error fetching order:', orderError);
+    return false;
+  }
+
+    // Update order status
+  const { error } = await supabase
+    .from('orders')
+    .update({ status: status })
+    .eq('id', orderId);
+
     if (error) {
       console.error('Error updating order:', error);
       return false;
-    } else {
-      await fetchOrders();
-      return true;
-    }
+    } 
+    // Handle inventory changes when status changes to 'delivered'
+  if (status === 'delivered' && order.status !== 'delivered') {
+    await updateProductInventory(order.product_id, -order.quantity);
+  }
+  await fetchOrders();
+  return true;
   };
 
   const deleteOrder = async (orderId: string) => {
@@ -224,7 +281,9 @@ export const useProducts = (typeId: string) => {
           : undefined,
         description_content: Array.isArray(product.description_content)
           ? product.description_content as Array<{ type: 'text' | 'image'; content: string }>
-          : null
+          : null,
+        min_quantity: product.min_quantity ?? 1,
+        max_quantity: product.max_quantity ?? null
       }));
       setProducts(transformedProducts);
     }
@@ -243,8 +302,9 @@ export const useProducts = (typeId: string) => {
         product_type_id: product.product_type_id,
         options: product.options,
         quantity_offers: product.quantity_offers ,// ADDED THIS LINE
-        description_content: product.description_content
-
+        description_content: product.description_content,
+        min_quantity: product.min_quantity,
+        max_quantity: product.max_quantity 
 
       }])
       .select()
@@ -265,7 +325,9 @@ export const useProducts = (typeId: string) => {
       .update({
       ...updates,
       // Ensure description_content is properly handled
-      description_content: updates.description_content
+      description_content: updates.description_content,
+      min_quantity: updates.min_quantity,
+      max_quantity: updates.max_quantity
     })
       .eq('id', id);
     
@@ -275,6 +337,8 @@ export const useProducts = (typeId: string) => {
       await fetchProducts();
     }
   };
+
+
 
   const deleteProduct = async (id: string) => {
     const { error } = await supabase

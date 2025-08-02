@@ -28,6 +28,8 @@ export interface Product {
   };
   quantity_offers?: Array<{ quantity: number; price: number }>; // Add this line
   description_content?: Array<{ type: 'text' | 'image'; content: string }> | null;
+  min_quantity: number;
+  max_quantity: number | null;
 
 }
 
@@ -98,11 +100,13 @@ export const useProductById = (productId: string) => {
           sizes: options.sizes || [],
           colors: options.colors || []
         },
-        quantity_offers: data.quantity_offers ? 
-          (typeof data.quantity_offers === 'string' ? 
-            JSON.parse(data.quantity_offers) : data.quantity_offers) as Array<{ quantity: number; price: number }> : 
+        quantity_offers: data.quantity_offers ?
+          (typeof data.quantity_offers === 'string' ?
+            JSON.parse(data.quantity_offers) : data.quantity_offers) as Array<{ quantity: number; price: number; }> :
           undefined,
-        description_content: parsedDescriptionContent
+        description_content: parsedDescriptionContent,
+        min_quantity: data.min_quantity || 1, // Default to 1 if not set
+        max_quantity: data.max_quantity !== undefined ? data.max_quantity : null, // Default to
       };
       setProduct(transformedProduct);
     }

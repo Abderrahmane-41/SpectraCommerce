@@ -104,6 +104,8 @@ export type Database = {
           updated_at: string | null
           quantity_offers: Json | null
           description_content?: Json | null
+          min_quantity: number
+          max_quantity: number | null
         }
         Insert: {
           base_price: number
@@ -118,6 +120,8 @@ export type Database = {
           updated_at?: string | null
           quantity_offers?: Json | null
           description_content?: Json | null
+          min_quantity: number
+          max_quantity: number | null
         }
         Update: {
           base_price?: number
@@ -131,6 +135,8 @@ export type Database = {
           updated_at?: string | null
           quantity_offers?: Json | null
           description_content?: Json | null
+          min_quantity: number
+          max_quantity: number | null
         }
         Relationships: [
           {

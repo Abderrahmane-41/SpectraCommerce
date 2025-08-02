@@ -107,9 +107,17 @@ const ProductPage = () => {
   const { shippingData, loading: shippingLoading, error: shippingError } = useShippingData();
   const { addOrder } = useOrders();
   const { reviews, loading: reviewsLoading } = useReviews(productId || '');
+    const [isHolding, setIsHolding] = useState(false);
+  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const holdIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const isOutOfStock = product && product.max_quantity !== null && product.max_quantity <= (product.min_quantity || 1);
+
 
   // Effect to update the dynamic price when options change
   useEffect(() => {
+    
+
     if (product) {
         let currentPrice = product.base_price;
 
@@ -168,6 +176,12 @@ const ProductPage = () => {
   }, [emblaApi]);
 
   useEffect(() => {
+    if (product && product.min_quantity) {
+      setQuantity(product.min_quantity);
+    }
+  }, [product]);
+
+  useEffect(() => {
     if (!emblaApi) return;
     emblaApi.on('select', onSelect);
     return () => { emblaApi.off('select', onSelect); };
@@ -181,8 +195,57 @@ const ProductPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const incrementQuantity = () => setQuantity(q => q + 1);
-  const decrementQuantity = () => setQuantity(q => (q > 1 ? q - 1 : 1));
+   // Update quantity functions with limits
+  const incrementQuantity = () => {
+    if (product?.max_quantity === null) {
+      setQuantity(q => q + 1);
+    } else {
+      setQuantity(q => Math.min(q + 1, product.max_quantity!));
+    }
+  };
+
+
+  const handleSingleClick = (action: 'increment' | 'decrement') => {
+  if (action === 'increment') {
+    incrementQuantity();
+  } else {
+    decrementQuantity();
+  }
+};
+ 
+
+  // Hold-to-click functionality
+ const startHold = (action: 'increment' | 'decrement') => {
+  setIsHolding(true);
+  
+  // Start repeating after 500ms delay (don't call action immediately)
+  holdTimeoutRef.current = setTimeout(() => {
+    holdIntervalRef.current = setInterval(() => {
+      if (action === 'increment') {
+        incrementQuantity();
+      } else {
+        decrementQuantity();
+      }
+    }, 100); // Repeat every 100ms for fast increment
+  }, 500);
+};
+
+
+  const stopHold = () => {
+  setIsHolding(false);
+  if (holdTimeoutRef.current) {
+    clearTimeout(holdTimeoutRef.current);
+    holdTimeoutRef.current = null;
+  }
+  if (holdIntervalRef.current) {
+    clearInterval(holdIntervalRef.current);
+    holdIntervalRef.current = null;
+  }
+};
+
+  const decrementQuantity = () => {
+    setQuantity(q => Math.max(q - 1, product?.min_quantity || 1));
+  };
 
   const handleSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => setSize(e.target.value);
   const handleColorChange = (e: React.ChangeEvent<HTMLSelectElement>) => setColor(e.target.value);
@@ -340,6 +403,8 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
     );
   }
 
+  
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -488,13 +553,70 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold mb-1">الكمية</label>
-                      <div className="flex items-center space-x-24">
-                        <button type="button" onClick={decrementQuantity} className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors disabled:opacity-50" disabled={quantity <= 1}>-</button>
-                        <span className='font-bold text-sm'>{quantity}</span>
-                        <button type="button" onClick={incrementQuantity} className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors">+</button>
-                      </div>
-                    </div>
+              <label className="block text-xs font-bold mb-1">
+                الكمية
+                {product?.max_quantity !== null && (
+                  <span className="text-muted-foreground ml-2">
+                    (متبقي: {product.max_quantity})
+                  </span>
+                )}
+                {product?.max_quantity === null && (
+                  <span className="text-green-600 ml-2 text-xs">
+                    (غير محدود)
+                  </span>
+                )}
+              </label>
+              <div className="flex items-center space-x-4">
+                <button
+                  type="button"
+                  onClick={() => handleSingleClick('decrement')}
+                  onMouseDown={() => startHold('decrement')}
+                  onMouseUp={stopHold}
+                  onMouseLeave={stopHold}
+                  onTouchStart={() => startHold('decrement')}
+                  onTouchEnd={stopHold}
+                  className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors disabled:opacity-50"
+                  disabled={quantity <= (product?.min_quantity || 1) || isOutOfStock}
+                >
+                  -
+                </button>
+                <span className="font-bold text-sm min-w-[2rem] text-center">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => handleSingleClick('increment')}
+                  onMouseDown={() => startHold('increment')}
+                  onMouseUp={stopHold}
+                  onMouseLeave={stopHold}
+                  onTouchStart={() => startHold('increment')}
+                  onTouchEnd={stopHold}
+                  className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors disabled:opacity-50"
+                  disabled={product?.max_quantity !== null && quantity >= product.max_quantity}
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Show current quantity info */}
+              <div className="text-xs text-muted-foreground mt-1">
+                {product?.min_quantity && product.min_quantity > 1 && (
+                  <span>الحد الأدنى: {product.min_quantity} • </span>
+                )}
+                {product?.max_quantity !== null && (
+                  <span>الحد الأقصى: {product.max_quantity}</span>
+                )}
+                {product?.max_quantity === null && (
+                  <span>كمية غير محدودة</span>
+                )}
+              </div>
+              </div>
+
+              {/* Show out of stock message */}
+                {isOutOfStock && (
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-center">
+                    <p className="text-red-600 font-semibold">المنتج غير متوفر حالياً</p>
+                  </div>
+                )}
+
                     {product && wilaya && (
                       <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
                         <h4 className="font-semibold"> :تفاصيل السعر</h4>
@@ -516,11 +638,31 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                       </div>
                     )}
 
-                    <button  type="submit" disabled={isPlacingOrder} className="w-full btn-gradient py-3 rounded-lg font-semibold text-sm disabled:opacity-50 flex items-center justify-center space-x-2">
-
-                      {isPlacingOrder ? (<><div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div><span>جاري تقديم الطلب...</span></>) : (<><ShoppingCart  className="w-4 h-4" /><span>تقديم الطلب</span></>)}
-
-                    </button>
+                    <button
+                        type="submit"
+                        disabled={isPlacingOrder || isOutOfStock}
+                        className={`w-full py-3 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all ${
+                          isOutOfStock 
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50' 
+                            : 'btn-gradient disabled:opacity-50'
+                        }`}
+                      >
+                        {isOutOfStock ? (
+                          <>
+                            <span>غير متوفر</span>
+                          </>
+                        ) : isPlacingOrder ? (
+                          <>
+                            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                            <span>جاري تقديم الطلب...</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-4 h-4" />
+                            <span>تقديم الطلب</span>
+                          </>
+                        )}
+                      </button>
 
                 </form>
                 </div>

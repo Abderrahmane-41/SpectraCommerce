@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Plus, Package, Edit, Trash2, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { Plus, Package, Edit, Trash2, ChevronDown, ChevronUp, Eye, AlertTriangle } from 'lucide-react';
 import { useProductTypes, useProducts } from '../../hooks/useSupabaseStore';
 import AddProductModal from './AddProductModal';
 import ImageUpload from '../ImageUpload';
@@ -35,6 +35,7 @@ const ProductsTab = () => {
   const getProductsByType = (typeId: string) => {
     return products.filter(product => product.product_type_id === typeId);
   };
+  
 
 // Update the handleDeleteConfirm function
 // Fix the handleDeleteConfirm function
@@ -208,7 +209,7 @@ const handleDeleteConfirm = async () => {
                 className="flex-1 btn-gradient py-2 rounded-lg disabled:opacity-50 text-xs sm:text-sm"
                 disabled={loading}
               >
-                {loading ? 'جارٍ الحفظ...' : (editingType ? 'تحديث النوع' : 'إضافة نوع')}
+                {loading ? ' ...جارٍ الحفظ' : (editingType ? 'تحديث النوع' : 'إضافة نوع')}
               </button>
             </div>
           </form>
@@ -306,6 +307,22 @@ const DeleteConfirmModal = () => (
                   <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 text-white">
                     <h3 className="text-sm sm:text-lg font-bold">{type.name}</h3>
                     <p className="text-xs sm:text-sm opacity-90">{typeProducts.length} منتجات</p>
+                    {/* ADD INVENTORY SUMMARY */}
+                    <div className="text-xs opacity-80">
+                      {(() => {
+                        const outOfStock = typeProducts.filter(p => p.max_quantity !== null && p.max_quantity <= (p.min_quantity || 1)).length;
+                        const unlimited = typeProducts.filter(p => p.max_quantity === null).length;
+                        const inStock = typeProducts.length - outOfStock - unlimited;
+                        
+                        return (
+                          <div className="flex space-x-2">
+                            {unlimited > 0 && <span>🟢 {unlimited} غير محدود</span>}
+                            {inStock > 0 && <span>🔵 {inStock} متوفر</span>}
+                            {outOfStock > 0 && <span>🔴 {outOfStock} نفد</span>}
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
                 
@@ -321,6 +338,13 @@ const DeleteConfirmModal = () => (
                     >
                       <Plus className="w-3 h-3" />
                       <span>إضافة</span>
+                      {/* ADD INVENTORY INDICATOR */}
+                      {(() => {
+                        const lowStock = typeProducts.filter(p => p.max_quantity !== null && p.max_quantity <= (p.min_quantity || 1) * 2).length;
+                        return lowStock > 0 ? (
+                          <AlertTriangle className="w-3 h-3 text-orange-500 ml-1" />
+                        ) : null;
+                      })()}
                     </button>
                     
                     <div className="flex space-x-1">
@@ -365,34 +389,52 @@ const DeleteConfirmModal = () => (
                       {typeProducts.length > 0 ? (
                         <div className="space-y-1 sm:space-y-2 max-h-32 sm:max-h-40 overflow-y-auto">
                           {typeProducts.map(product => (
-                            <div key={product.id} className="flex justify-between items-center p-1.5 sm:p-2 bg-muted/30 rounded text-xs sm:text-sm">
-                              <div>
-                                <p className="font-medium">{product.name}</p>
-                                <p className="text-muted-foreground">{product.base_price} DA</p>
-                              </div>
-                              <div className="flex space-x-0.5 sm:space-x-1">
-                                <button
-                                  onClick={() => {
-                                    setEditingProduct(product);
-                                    setSelectedTypeId(type.id);
-                                    setShowEditProductModal(true);
-                                  }}
-                                  className="p-0.5 sm:p-1 hover:bg-muted/50 rounded"
-                                >
-                                  <Edit className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setDeleteTarget({type: 'product', id: product.id});
-                                    setShowDeleteConfirm(true);
-                                  }}
-                                  className="p-0.5 sm:p-1 hover:bg-red-500/10 hover:text-red-500 rounded"
-                                >
-                                  <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                                </button>
+                          <div key={product.id} className="flex justify-between items-center p-1.5 sm:p-2 bg-muted/30 rounded text-xs sm:text-sm">
+                            <div>
+                              <p className="font-medium">{product.name}</p>
+                              <p className="text-muted-foreground">{product.base_price} DA</p>
+                              {/* ADD THIS INVENTORY DISPLAY */}
+                              <div className="flex items-center space-x-1 text-xs">
+                                {product.max_quantity === null ? (
+                                  <span className="text-green-600">غير محدود</span>
+                                ) : product.max_quantity <= (product.min_quantity || 1) ? (
+                                  <span className="text-red-600 font-semibold">نفد المخزون</span>
+                                ) : (
+                                  <span className="text-blue-600">{product.max_quantity} متبقي</span>
+                                )}
+                                <span className="text-muted-foreground"> :المخزون</span>
+
                               </div>
                             </div>
-                          ))}
+                            <div className="flex space-x-0.5 sm:space-x-1">
+                              {/* ADD INVENTORY BADGE NEXT TO EDIT BUTTON */}
+                              {product.max_quantity !== null && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 mr-1">
+                                  {product.max_quantity}
+                                </span>
+                              )}
+                              <button
+                                onClick={() => {
+                                  setEditingProduct(product);
+                                  setSelectedTypeId(type.id);
+                                  setShowEditProductModal(true);
+                                }}
+                                className="p-0.5 sm:p-1 hover:bg-muted/50 rounded"
+                              >
+                                <Edit className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeleteTarget({type: 'product', id: product.id});
+                                  setShowDeleteConfirm(true);
+                                }}
+                                className="p-0.5 sm:p-1 hover:bg-red-500/10 hover:text-red-500 rounded"
+                              >
+                                <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
                         </div>
                       ) : (
                         <p className="text-muted-foreground text-xs sm:text-sm">لا توجد منتجات بعد</p>
