@@ -5,15 +5,22 @@ export const getBaseUrl = (): string => {
 
   const { protocol, hostname, port } = window.location;
   
+  console.log('Current location:', { protocol, hostname, port }); // Debug log
+  
   // Development environment
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `${protocol}//${hostname}:${port}`;
+    // Make sure we use the correct port
+    const currentPort = port || '8080';
+    return `${protocol}//${hostname}:${currentPort}`;
   }
   
-  // Production environment (Netlify, Vercel, or any other hosting)
+  // Production environment
   return `${protocol}//${hostname}`;
 };
 
 export const getPasswordResetUrl = (): string => {
-  return `${getBaseUrl()}/auth?type=recovery`;
+  const baseUrl = getBaseUrl();
+  const resetUrl = `${baseUrl}/auth?type=recovery`;
+  console.log('Generated reset URL:', resetUrl); // Debug log
+  return resetUrl;
 };

@@ -86,9 +86,12 @@ const AuthPasswordResetModal = ({ isOpen, onClose }: AuthPasswordResetModalProps
         return;
       }
 
+      const redirectUrl = getPasswordResetUrl();
+      console.log('Sending reset email with redirect URL:', redirectUrl);
+
       // If email exists, send reset link
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: getPasswordResetUrl(),
+        redirectTo: redirectUrl,
       });
 
       if (error) {
