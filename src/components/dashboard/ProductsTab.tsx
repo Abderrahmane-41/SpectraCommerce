@@ -392,24 +392,24 @@ const DeleteConfirmModal = () => (
                           <div key={product.id} className="flex justify-between items-center p-1.5 sm:p-2 bg-muted/30 rounded text-xs sm:text-sm">
                             <div>
                               <p className="font-medium">{product.name}</p>
-                              <p className="text-muted-foreground">{product.base_price} DA</p>
+                              <p className="text-foreground">{product.base_price} DA</p>
                               {/* ADD THIS INVENTORY DISPLAY */}
                               <div className="flex items-center space-x-1 text-xs">
                                 {product.max_quantity === null ? (
-                                  <span className="text-green-600">غير محدود</span>
+                                  <span className="text-green-600 font-semibold">غير محدود</span>
                                 ) : product.max_quantity <= (product.min_quantity || 1) ? (
-                                  <span className="text-red-600 font-semibold">نفد المخزون</span>
+                                  <span className="text-red-600 font-bold">نفد المخزون</span>
                                 ) : (
-                                  <span className="text-blue-600">{product.max_quantity} متبقي</span>
+                                  <span className="text-blue-900 font-bold">{product.max_quantity} متبقي</span>
                                 )}
-                                <span className="text-muted-foreground"> :المخزون</span>
+                                <span className="text-foreground font-semibold"> :المخزون</span>
 
                               </div>
                             </div>
                             <div className="flex space-x-0.5 sm:space-x-1">
                               {/* ADD INVENTORY BADGE NEXT TO EDIT BUTTON */}
                               {product.max_quantity !== null && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 mr-1">
+                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-900 font-bold mr-1">
                                   {product.max_quantity}
                                 </span>
                               )}

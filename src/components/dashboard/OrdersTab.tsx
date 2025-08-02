@@ -401,7 +401,7 @@ const OrdersTab = () => {
                     <div className="flex items-center justify-between">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                           <button className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium transition-colors flex items-center gap-1 ${statusColors[order.status]}`}>
+                           <button className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 ${statusColors[order.status]}`}>
                             {statusTranslations[order.status]}
                             <ChevronDown className="w-3 h-3" />
                            </button>
@@ -534,7 +534,7 @@ const calculateTotalProfit = () => {
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-semibold">إجمالي الأرباح</h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground font-semibold">
                   {activeFiltersCount > 0 ? 'مصفاة' : 'كل الطلبات'}
                 </p>
               </div>
