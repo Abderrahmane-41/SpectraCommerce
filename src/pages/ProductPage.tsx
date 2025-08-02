@@ -389,12 +389,13 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
               <div className="space-y-2">
                 {product.quantity_offers.sort((a, b) => a.quantity - b.quantity).map((offer, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg">
-                    <p className="font-semibold text-green-700 dark:text-green-300">
-                      اشتري {offer.quantity} قطع
-                    </p>
                     <p className="font-bold text-lg text-green-600 dark:text-green-400">
                       {offer.price} DA
                     </p>
+                    <p className="font-semibold text-green-700 dark:text-green-300">
+                      اشتري {offer.quantity} قطع
+                    </p>
+                    
                   </div>
                 ))}
               </div>
@@ -431,7 +432,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
           <option value="">اختر الولاية</option>
           {orderedAvailableWilayas.map((wilayaName, index) => ( // <--- Updated line: use orderedAvailableWilayas and get index
             <option key={wilayaName} value={wilayaName}>
-              {`${index + 1} - ${wilayaName} (${shippingData.shippingPrices[wilayaName]} دج)`}
+              {`${index + 1} - ${wilayaName} (${shippingData.shippingPrices[wilayaName]} DA)`}
             </option>
           ))}
         </select>
@@ -486,18 +487,21 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                     </div>
                     {product && wilaya && (
                       <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
-                        <h4 className="font-semibold">تفاصيل السعر:</h4>
+                        <h4 className="font-semibold"> :تفاصيل السعر</h4>
                         <div className="flex justify-between text-xs">
-                          <span>سعر المنتج (x{quantity}):</span>
-                          <span>{calculatePriceForQuantity(quantity)} دج</span>
+                          <span>دج {calculatePriceForQuantity(quantity)} </span>
+                          <span>  :(x{quantity})سعر المنتج </span>
+
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span>الشحن{shipToHome ? ' (توصيل منزلي)' : ''}:</span>
-                          <span>{calculateShippingCost()} دج</span>
+                          <span> دج{calculateShippingCost()} </span>
+                          <span> :{shipToHome ? ' (توصيل منزلي)' : ''}الشحن</span>
+
                         </div>
                         <div className="flex justify-between font-bold border-t pt-2">
-                          <span>المجموع:</span>
                           <span>{calculateTotalPrice()} دج</span>
+                          <span> :المجموع</span>
+
                         </div>
                       </div>
                     )}
