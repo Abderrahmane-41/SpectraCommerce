@@ -52,7 +52,7 @@ const ALGERIAN_WILAYAS_ORDERED_58 = [
 
 
 // Helper Component for Product Header, now receives dynamic price
-const ProductHeader = ({ product, averageRating, reviewsCount, dynamicPrice }: { product: Product; averageRating: number; reviewsCount: number; dynamicPrice: number; }) => (
+const ProductHeader = ({ product, reviewsCount,averageRating, dynamicPrice }: { product: Product;reviewsCount: number; averageRating: number; dynamicPrice: number; }) => (
   <div>
     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">{product.name}</h1>
     <p className="text-xl text-green-500 sm:text-2xl md:text-3xl font-bold mb-3">
@@ -63,15 +63,19 @@ const ProductHeader = ({ product, averageRating, reviewsCount, dynamicPrice }: {
           {product.price_before_discount} DA
         </p>
       )}
-    <div className="flex items-center space-x-0 mb-4">
-      <StarRating rating={averageRating} readonly size="md" />
-      <span className="text-sm font-medium ml-1">{averageRating.toFixed(1)}</span>
-      <span className="text-xs text-muted-foreground">(تقييم{reviewsCount !== 1 ? 'ات' : ''}{reviewsCount} )</span>
-    </div>
-    <p className="text-lg font-bold mb-2">وصف المنتج</p>
-    <p className="text-sm text-muted-foreground leading-relaxed">
-      {product.description}
-    </p>
+
+      <div className="flex items-center space-x-0 mb-4">
+                <StarRating rating={averageRating} readonly size="md" />
+                <span className="text-sm font-medium ml-1">{averageRating.toFixed(1)}</span>
+                <span className="text-xs text-muted-foreground">(تقييم{reviewsCount !== 1 ? 'ات' : ''}{reviewsCount} )</span>
+              </div>
+
+              <p className="text-lg font-bold mb-2">وصف المنتج</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {product.description}
+              </p>
+    
+    
   </div>
 );
 
@@ -347,18 +351,20 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
       </div>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-16 py-12 sm:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-
-          <motion.div className="space-y-6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-            <motion.h1
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold gradient-text capitalize px-2 py-3 leading-tight"
+        <motion.h1
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold gradient-text capitalize px-2 py-3 my-2 leading-tight"
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
             >
                 تفاصيل المنتج
             </motion.h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+          <motion.div className="space-y-6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+            
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+            
             <div ref={emblaRef} className="overflow-hidden">
               <div className="flex">
                 {product.images?.map((image, index) => (
@@ -381,7 +387,11 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
               />
             )}
           </motion.div>
-            <ProductHeader product={product} averageRating={averageRating} reviewsCount={reviews.length} dynamicPrice={dynamicProductPrice} />
+          </motion.div>
+            <motion.div className="space-y-6 lg:order-2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
+
+            <ProductHeader product={product} reviewsCount={reviews.length} averageRating={averageRating} dynamicPrice={dynamicProductPrice} />
+
 
             {product.quantity_offers && product.quantity_offers.length > 0 && (
             <div className="mt-6">
@@ -558,7 +568,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                       <img 
                         src={block.content} 
                         alt={`تفاصيل المنتج ${index + 1}`} 
-                        className="w-full max-w-2xl mx-auto rounded-lg shadow-md object-cover"
+                        className="w-full max-w-2xl mx-auto rounded-lg shadow-md object-contain"
                         loading="lazy"
                       />
                     </div>
