@@ -447,7 +447,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
         </button>
       </div>
 
-      <main className="max-w-7xl mx-auto my-0 px-2 sm:px-0 py-6 sm:py-10">
+      <main className="max-w-7xl mx-auto my-0 px-2 sm:px-2 py-6 sm:py-10">
         <motion.h1
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold gradient-text capitalize px-2 py-3 my-2 leading-tight"
                 initial={{ y: 30, opacity: 0 }}
@@ -456,7 +456,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
             >
                 تفاصيل المنتج
             </motion.h1>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-2 gap-8 lg:gap-12">
 
           <motion.div className="space-y-6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             
@@ -657,17 +657,27 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                       <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
                         <h4 className="font-semibold"> :تفاصيل السعر</h4>
                         <div className="flex justify-between text-xs">
-                          <span>دج {calculatePriceForQuantity(quantity)} </span>
+                          <span>
+                          <span className="inline-block">دج </span>
+                          <span> {calculatePriceForQuantity(quantity)}  </span>
+                          </span>
+                          
                           <span>  :(x{quantity})سعر المنتج </span>
 
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span> دج{calculateShippingCost()} </span>
+                          <span>
+                          <span className="inline-block">دج </span>
+                          <span> {calculateShippingCost()}  </span>
+                          </span>
                           <span> :{shipToHome ? ' (توصيل منزلي)' : ''}الشحن</span>
 
                         </div>
                         <div className="flex justify-between font-bold border-t pt-2">
-                          <span>{calculateTotalPrice()} دج</span>
+                          <span>
+                          <span className="inline-block">دج </span>
+                          <span> {calculateTotalPrice()} </span>
+                          </span>
                           <span> :المجموع</span>
 
                         </div>
