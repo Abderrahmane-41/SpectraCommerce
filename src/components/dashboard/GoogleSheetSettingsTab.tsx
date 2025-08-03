@@ -160,7 +160,7 @@ export function GoogleSheetSettingsTab() {
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
                   1
                 </span>
-                <span>قم بإنشاء جدول Google Sheet جديد.</span>
+                <span>قم بإنشاء جدول Google Sheet جديد.وقم بتسميته</span>
               </li>
               
               <li className="leading-relaxed flex items-start">
