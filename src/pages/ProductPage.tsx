@@ -771,14 +771,14 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                 <div className="p-2 glass-effect rounded-lg relative z-10">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
                     <div className="flex flex-wrap items-center mb-1 sm:mb-0">
-                      <span className="font-semibold mr-2 break-words max-w-[80%]">{review.reviewer_name || 'مجهول'}</span>
+                      <span className="font-bold mr-2 break-words max-w-[80%]">{review.reviewer_name || 'مجهول'}</span>
                       <div className="star-rating-compact -space-x-2">
                         <StarRating rating={review.rating} readonly size="sm" />
                       </div>
                     </div>
-                    <span className="text-xs text-foreground ">{new Date(review.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs text-foreground font-medium">{new Date(review.created_at).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-foreground text-sm ">{review.comment}</p>
+                  <p className="text-foreground text-sm font-semibold">{review.comment}</p>
                 </div>
               </div>
             ))}
