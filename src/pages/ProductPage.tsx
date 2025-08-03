@@ -209,7 +209,7 @@ const { settings } = useStoreSettings();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [productId]);
 
   const upsaleProducts = useMemo(() => {
   if (!product) return [];

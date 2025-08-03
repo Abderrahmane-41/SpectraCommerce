@@ -230,6 +230,7 @@ const updateProductInventory = async (productId: string, quantityChange: number)
       console.error("Failed to create order in Supabase:", error);
       return null;
     }
+    const isDevelopment = process.env.NODE_ENV === 'development';
 
     // 2. Sync to Google Sheets if URL is provided
     if (gsheetUrl && createdOrder) {

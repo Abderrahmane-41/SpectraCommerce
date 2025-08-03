@@ -26,8 +26,12 @@ export const useShippingData = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false); // ✅ Add loaded state
+
 
   const loadShippingData = async () => {
+        if (isLoaded) return; // ✅ Prevent duplicate loading
+
     try {
       setLoading(true);
       setError(null);

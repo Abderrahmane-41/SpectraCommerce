@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
+import { motion } from 'framer-motion';
 
 export function GoogleSheetsDebug() {
   const [isLoading, setIsLoading] = useState(false);
@@ -96,28 +97,57 @@ export function GoogleSheetsDebug() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>اختبار Google Sheets</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Button onClick={testGoogleSheetsConnection} disabled={isLoading}>
-            {isLoading ? 'جاري الاختبار...' : 'اختبار الاتصال'}
-          </Button>
-          <Button variant="outline" onClick={clearDebugOutput}>
-            مسح السجل
-          </Button>
-        </div>
-        
-        {debugOutput.length > 0 && (
-          <div className="bg-gray-100 p-3 rounded-md text-xs max-h-60 overflow-y-auto">
-            <pre className="whitespace-pre-wrap text-right" dir="rtl">
-              {debugOutput.join('\n')}
-            </pre>
+    <div className="relative p-[3px]">
+      <div className="absolute inset-0 rounded-xl bg-gradient-primary dark:bg-gradient-primary-dark"></div>
+      <Card className="relative z-10 bg-card dark:bg-card rounded-xl border-0">
+        <CardHeader>
+          <CardTitle className="text-right gradient-text text-xl font-bold">
+            اختبار Google Sheets
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4" dir="rtl">
+          <div className="flex gap-3 justify-start">
+            <Button 
+              onClick={testGoogleSheetsConnection} 
+              disabled={isLoading}
+              className="btn-gradient"
+            >
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>...جاري الاختبار</span>
+                </div>
+              ) : (
+                'اختبار الاتصال'
+              )}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={clearDebugOutput}
+              className="glass-effect border-border hover:bg-primary/10"
+            >
+              مسح السجل
+            </Button>
           </div>
-        )}
-      </CardContent>
-    </Card>
+          
+          {debugOutput.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="glass-effect bg-card dark:bg-card border border-border rounded-lg overflow-hidden"
+            >
+              <div className="bg-gradient-primary dark:bg-gradient-primary-dark px-4 py-2">
+                <span className="text-white font-semibold text-sm">سجل الاختبار</span>
+              </div>
+              <div className="p-4 max-h-60 overflow-y-auto">
+                <pre className="text-xs font-mono text-foreground whitespace-pre-wrap text-right">
+                  {debugOutput.join('\n')}
+                </pre>
+              </div>
+            </motion.div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
