@@ -30,6 +30,7 @@ export type Database = {
           ip_address?: string
           quantity: number
           order_time: string
+          is_synced_to_gsheet: boolean | null// Add this line
         }
         Insert: {
           color: string
@@ -48,6 +49,8 @@ export type Database = {
           total_price: number
           updated_at?: string | null
           wilaya: string
+          order_time?: string
+          is_synced_to_gsheet?: boolean | null // Add this line
         }
         Update: {
           color?: string
@@ -63,6 +66,11 @@ export type Database = {
           total_price?: number
           updated_at?: string | null
           wilaya?: string
+          product_id?: string
+          ip_address?: string
+          quantity?: number
+          order_time?: string
+          is_synced_to_gsheet?: boolean | null // Add this line
         }
         Relationships: []
       }
@@ -159,6 +167,7 @@ export type Database = {
           facebook_pixel_id: string | null // Added
           created_at: string
           updated_at: string
+          google_sheet_api_url?: string | null // Added
         }
         Insert: {
           id?: number
@@ -170,6 +179,7 @@ export type Database = {
           facebook_pixel_id?: string | null // Added
           created_at?: string
           updated_at?: string
+          google_sheet_api_url?: string | null // Added
         }
         Update: {
           id?: number
@@ -181,6 +191,7 @@ export type Database = {
           facebook_pixel_id?: string | null // Added
           created_at?: string
           updated_at?: string
+          google_sheet_api_url?: string | null // Added
         }
         Relationships: []
       }
@@ -251,6 +262,7 @@ export type Database = {
           id: string
           updated_at: string
           wilaya: string
+          shipping_home_price:number
         }
         Insert: {
           base_price?: number
@@ -259,6 +271,7 @@ export type Database = {
           id?: string
           updated_at?: string
           wilaya: string
+          shipping_home_price:number
         }
         Update: {
           base_price?: number
@@ -267,6 +280,7 @@ export type Database = {
           id?: string
           updated_at?: string
           wilaya?: string
+          shipping_home_price?:number
         }
         Relationships: []
       }

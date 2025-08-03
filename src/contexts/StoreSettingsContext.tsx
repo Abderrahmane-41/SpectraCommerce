@@ -13,6 +13,8 @@ export interface StoreSettings {
   };
   phone_number: string;
   facebook_pixel_id: string; // Added
+  google_sheet_api_url?: string | null;
+
 }
 
 interface StoreSettingsContextType {
@@ -75,7 +77,9 @@ export const StoreSettingsProvider = ({ children }: { children: ReactNode }) => 
                 instagram?: string;
                 telegram?: string;
             },
-            facebook_pixel_id: data.facebook_pixel_id || '', // Ensure it's a string, default to empty
+            facebook_pixel_id: data.facebook_pixel_id || '', // Ensure it's a string, 
+            // default to empty
+            google_sheet_api_url: data.google_sheet_api_url || null,
         };
         setSettings(formattedSettings);
     }

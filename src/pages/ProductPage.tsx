@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Info, ShoppingCart } from 'lucide-react';
-import { useProductById, useReviews, useOrders, Product } from '../hooks/useProductData';
+import { useProductById, useReviews, Product } from '../hooks/useProductData';
 import { useShippingData } from '../hooks/useShippingData';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StarRating from '../components/StarRating';
@@ -16,8 +16,11 @@ import { getClientIp } from '../hooks/useProductData.ts';
 import OrderSuccessModal from '../components/OrderSuccessModal';
 import { Button } from '../components/ui/button';
 import ProductCard from '../components/ProductCard';
-import { useProducts } from '../hooks/useSupabaseStore';
+import { useProducts ,useOrders} from '../hooks/useSupabaseStore';
 import HowToOrder from '@/components/HowToOrder.tsx';
+
+import { useStoreSettings } from '@/contexts/StoreSettingsContext';
+
 
 
 // Update the ImageSlide component near the top of the file
@@ -86,6 +89,8 @@ const ProductHeader = ({ product, reviewsCount,averageRating, dynamicPrice }: { 
 
 
 const ProductPage = () => {
+const { settings } = useStoreSettings();
+
   const { productId } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
@@ -114,7 +119,7 @@ const ProductPage = () => {
   const { shippingData, loading: shippingLoading, error: shippingError } = useShippingData();
   const { addOrder } = useOrders();
   const { reviews, loading: reviewsLoading } = useReviews(productId || '');
-    const [isHolding, setIsHolding] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const holdIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -350,6 +355,7 @@ const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
     try {
       const ipAddress = await getClientIp();
 
+
       const orderData = {
         product_id: product.id,
         product_name: product.name,
@@ -357,7 +363,6 @@ const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
         size: product.options?.sizes?.length > 0 ? size : 'لا يوجد',
         color: product.options?.colors?.length > 0 ? color : 'لا يوجد',
         quantity,
-        base_price: dynamicProductPrice, // Use the dynamic price
         total_price: calculateTotalPrice(),
         customer_name: customerName,
         customer_phone: customerPhone,
@@ -366,7 +371,9 @@ const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
         full_address: shipToHome ? `${commune}, ${wilaya}` : `${wilaya} إستلام من `,
         status: 'pending' as const,
       };
-      const newOrder = await addOrder(orderData);
+
+      const newOrder = await addOrder(orderData, settings?.google_sheet_api_url);
+      
       if (newOrder) {
         setNewOrderDetails(newOrder);
         setIsSuccessModalOpen(true);

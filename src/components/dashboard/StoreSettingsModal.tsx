@@ -1,7 +1,7 @@
 // src/components/dashboard/StoreSettingsModal.tsx
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Facebook, Instagram, Send } from 'lucide-react';
+import { X , Facebook, Instagram, Send } from 'lucide-react';
 import { useStoreSettings, StoreSettings } from '@/contexts/StoreSettingsContext';
 import ImageUpload from '../ImageUpload';
 import { toast } from 'sonner';

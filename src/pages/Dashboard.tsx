@@ -17,6 +17,10 @@ import DashboardMobileMenu from '../components/dashboard/DashboardMobileMenu';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Helmet } from 'react-helmet-async';
+import { GoogleSheetSettingsTab } from "@/components/dashboard/GoogleSheetSettingsTab"; // 1. Import
+
+
+
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
@@ -90,7 +94,7 @@ const Dashboard = () => {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="hidden sm:grid w-full grid-cols-5"> {/* Changed to grid-cols-5 */}
+              <TabsList className="hidden sm:grid w-full grid-cols-6"> {/* Changed to grid-cols-5 */}
                 <TabsTrigger value="orders" className="flex items-center space-x-1 sm:space-x-2">
                   <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="text-xs sm:text-sm">الطلبات</span>
@@ -111,6 +115,10 @@ const Dashboard = () => {
                  <BarChart className="w-3 h-3 sm:w-4 sm:h-4" />
                  <span className="text-xs sm:text-sm">تتبع لبيكسل فيسبوك</span>
                 </TabsTrigger>
+                <TabsTrigger value="google-sheets" className="flex items-center space-x-1 sm:space-x-2">
+                 <SettingsIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                 <span className="text-xs sm:text-sm">Google sheet </span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="orders" className="mt-4 sm:mt-6">
@@ -129,6 +137,10 @@ const Dashboard = () => {
               </TabsContent>
               <TabsContent value="facebook-pixel" className="mt-4 sm:mt-6"> {/* New content */}
                 <FacebookPixelSettingsTab />
+              </TabsContent>
+
+              <TabsContent value="google-sheets" className="mt-4 sm:mt-6"> 
+                <GoogleSheetSettingsTab />
               </TabsContent>
             </Tabs>
           </motion.div>

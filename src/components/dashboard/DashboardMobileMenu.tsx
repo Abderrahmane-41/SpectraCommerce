@@ -83,7 +83,13 @@ const menuItems = [
     label: ' تتبع لبيكسل فيسبوك',
     tab: 'facebook-pixel',
     type: 'tab'
-  }
+  },
+  {
+    icon: Settings,
+    label: 'Google sheet ',
+    tab: 'google-sheets',
+    type: 'tab'
+  },
 ]
 
 const accountItems = [

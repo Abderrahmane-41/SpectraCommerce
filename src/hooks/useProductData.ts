@@ -48,6 +48,10 @@ export interface OrderData {
   base_price: number;
   total_price: number;
   status: 'pending' | 'confirmed';
+  created_at?: string;
+  updated_at?: string | null;
+  order_time?: string; // Add this field for order time
+  is_synced_to_gsheet?: boolean; // Add this field to track GSheet sync
 }
 
 export const useProductById = (productId: string) => {
@@ -189,7 +193,7 @@ export const useOrders = () => {
     return data && data.length > 0;
   };
 
-  const addOrder = async (orderData: OrderData) => {
+  const addBasicOrder = async (orderData: OrderData) => {
     console.log('Adding order with data:', orderData);
     
     // Get client IP address
@@ -236,7 +240,7 @@ export const useOrders = () => {
     return data;
   };
 
-  return { addOrder };
+  return { addBasicOrder };
 };
 
 

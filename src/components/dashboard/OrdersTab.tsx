@@ -1,12 +1,14 @@
 // src/components/dashboard/OrdersTab.tsx
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Eye, Phone, MapPin, Package, Calendar, Filter, Trash2, ChevronDown, DollarSign, X, FileText } from 'lucide-react'; // Import FileText icon
 import { useOrders, useProducts, useProductTypes } from '../../hooks/useSupabaseStore';
 import OrderFilterModal from './OrderFilterModal';
 import { toast } from 'sonner';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { format } from 'date-fns';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertTriangle } from "lucide-react";
 
 
 // This is now the single source of truth for this type.
@@ -328,10 +330,26 @@ const OrdersTab = () => {
                     <span className="font-semibold text-sm sm:text-base">تفاصيل العميل</span>
                   </div>
                   <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
-<div className="flex justify-between items-center">
-                  <span className="font-bold ml-auto">{order.customer_name}</span>
-                  <strong className="ml-2"> : الإسم</strong>
-                </div>
+                <div className="flex justify-between items-center">
+                        {/* This is the new part for the icon */}
+                        <div className="flex items-center gap-2">
+                            {!order.is_synced_to_gsheet && (
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <AlertTriangle className="w-4 h-4 text-destructive" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>هذه الطلبية لم تتم مزامنتها مع جوجل شيتس.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            )}
+                            <span className="font-bold">{order.customer_name}</span>
+                        </div>
+                        {/* This part remains the same */}
+                        <strong className="ml-2"> : الإسم</strong>
+                    </div>
                                    <div className="flex items-center space-x-2">
                       <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
                       <a href={`tel:${order.customer_phone}`} className="hover:underline">{order.customer_phone}</a>
