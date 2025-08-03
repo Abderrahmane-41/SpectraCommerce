@@ -90,7 +90,7 @@ const ProductCard = ({ typeId, product }: ProductCardProps) => {
                 </p>
               {/* Product Description Preview (NEW) */}
                 {truncatedDescription && (
-                <p className="text-xs sm:text-sm text-gray-200 mt-0 line-clamp-3 overflow-hidden">
+                <p className="text-xs sm:text-sm text-gray-200 mt-0 line-clamp-3 overflow-hidden whitespace-pre-wrap">
                     {truncatedDescription}
                   </p>
                 )}

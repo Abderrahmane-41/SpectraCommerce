@@ -74,7 +74,7 @@ const ProductsPage = () => {
             <Navbar />
             
             <motion.div
-                className="pt-12 md:pt-32 pb-12 md:pb-20 px-0"
+                className="pt-12 md:pt-10 pb-12 md:pb-20 px-0"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

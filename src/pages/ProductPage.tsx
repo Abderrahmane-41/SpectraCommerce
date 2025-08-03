@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { useProductById, useReviews, useOrders, Product } from '../hooks/useProductData';
@@ -14,6 +14,9 @@ import { toast } from 'sonner';
 import useEmblaCarousel from 'embla-carousel-react';
 import { getClientIp } from '../hooks/useProductData.ts';
 import OrderSuccessModal from '../components/OrderSuccessModal';
+import { Button } from '../components/ui/button';
+import ProductCard from '../components/ProductCard';
+import { useProducts } from '../hooks/useSupabaseStore';
 
 
 // Update the ImageSlide component near the top of the file
@@ -71,7 +74,7 @@ const ProductHeader = ({ product, reviewsCount,averageRating, dynamicPrice }: { 
               </div>
 
               <p className="text-lg font-bold mb-2">وصف المنتج</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-foreground font-medium leading-relaxed whitespace-pre-wrap"  >
                 {product.description}
               </p>
     
@@ -100,7 +103,8 @@ const ProductPage = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [newOrderDetails, setNewOrderDetails] = useState(null);
-
+  const [upsaleDisplayCount, setUpsaleDisplayCount] = useState(0);
+  const { products } = useProducts('');
   const { product, loading } = useProductById(productId || '');
   const [dynamicProductPrice, setDynamicProductPrice] = useState(product?.base_price || 0);
 
@@ -195,6 +199,32 @@ const ProductPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const upsaleProducts = useMemo(() => {
+  if (!product) return [];
+  
+  // Get products from the same type, excluding current product
+  return products.filter(p => 
+    p.product_type_id === product.product_type_id && 
+    p.id !== product.id
+  );
+}, [products, product]);
+
+  // Add useEffect for upsale display count (add after existing useEffects)
+useEffect(() => {
+  const initialDisplay = Math.ceil(upsaleProducts.length * 0.40);
+  setUpsaleDisplayCount(initialDisplay > 0 ? initialDisplay : Math.min(upsaleProducts.length, 4));
+}, [upsaleProducts]);
+
+// Add handler function for show more button (add after existing handlers)
+const handleUpsaleShowMore = () => {
+  const increment = Math.ceil(upsaleProducts.length * 0.40);
+  setUpsaleDisplayCount(prevCount => Math.min(prevCount + increment, upsaleProducts.length));
+};
+
+const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
+
+  
+
    // Update quantity functions with limits
   const incrementQuantity = () => {
     if (product?.max_quantity === null) {
@@ -258,6 +288,8 @@ const ProductPage = () => {
     }
     return shippingData.shippingPrices[wilaya];
   };
+
+  
 
   const calculateTotalPrice = () => {
     if (!product) return 0;
@@ -406,7 +438,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
   
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background">
       <Navbar />
       <div className="sticky top-12 backdrop-blur-sm border-background p-0 sm:p-10 z-40">
         <button onClick={() => navigate('/')} className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors">
@@ -415,7 +447,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
         </button>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-16 py-12 sm:py-10">
+      <main className="max-w-7xl mx-auto my-0 px-2 sm:px-0 py-6 sm:py-10">
         <motion.h1
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold gradient-text capitalize px-2 py-3 my-2 leading-tight"
                 initial={{ y: 30, opacity: 0 }}
@@ -566,34 +598,38 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                   </span>
                 )}
               </label>
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={() => handleSingleClick('decrement')}
-                  onMouseDown={() => startHold('decrement')}
-                  onMouseUp={stopHold}
-                  onMouseLeave={stopHold}
-                  onTouchStart={() => startHold('decrement')}
-                  onTouchEnd={stopHold}
-                  className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors disabled:opacity-50"
-                  disabled={quantity <= (product?.min_quantity || 1) || isOutOfStock}
-                >
-                  -
-                </button>
-                <span className="font-bold text-sm min-w-[2rem] text-center">{quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => handleSingleClick('increment')}
-                  onMouseDown={() => startHold('increment')}
-                  onMouseUp={stopHold}
-                  onMouseLeave={stopHold}
-                  onTouchStart={() => startHold('increment')}
-                  onTouchEnd={stopHold}
-                  className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors disabled:opacity-50"
-                  disabled={product?.max_quantity !== null && quantity >= product.max_quantity}
-                >
-                  +
-                </button>
+              <div className="w-full">
+                <div className="flex items-center justify-between w-full border border-border rounded-lg overflow-hidden h-12">
+                  <button
+                    type="button"
+                    onClick={() => handleSingleClick('decrement')}
+                    onMouseDown={() => startHold('decrement')}
+                    onMouseUp={stopHold}
+                    onMouseLeave={stopHold}
+                    onTouchStart={() => startHold('decrement')}
+                    onTouchEnd={stopHold}
+                    className="flex-1 h-full flex items-center justify-center hover:bg-muted font-bold text-lg transition-colors disabled:opacity-50"
+                    disabled={quantity <= (product?.min_quantity || 1) || isOutOfStock}
+                  >
+                    -
+                  </button>
+                  <span className="flex-1 font-bold text-base h-full flex items-center justify-center border-x border-border">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSingleClick('increment')}
+                    onMouseDown={() => startHold('increment')}
+                    onMouseUp={stopHold}
+                    onMouseLeave={stopHold}
+                    onTouchStart={() => startHold('increment')}
+                    onTouchEnd={stopHold}
+                    className="flex-1 h-full flex items-center justify-center hover:bg-muted font-bold text-lg transition-colors disabled:opacity-50"
+                    disabled={product?.max_quantity !== null && quantity >= product.max_quantity}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
               {/* Show current quantity info */}
@@ -707,12 +743,14 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                 if (block.type === 'image' && block.content) {
                   return (
                     <div key={index} className="my-4">
-                      <img 
-                        src={block.content} 
-                        alt={`تفاصيل المنتج ${index + 1}`} 
-                        className="w-full max-w-2xl mx-auto rounded-lg shadow-md object-contain"
-                        loading="lazy"
-                      />
+                      <div className="flex justify-end">
+                        <img 
+                          src={block.content} 
+                          alt={`تفاصيل المنتج ${index + 1}`} 
+                          className="w-full h-70 sm:w-3/4 lg:w-1/2 rounded-lg shadow-md object-cover"
+                          loading="lazy"
+                        />
+                      </div>
                     </div>
                   );
                 }
@@ -747,6 +785,43 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
             </div>
           </motion.div>
         )}
+
+        {upsaleProducts.length > 0 && (
+            <motion.section 
+              className="py-6 sm:py-8 md:py-12 px-3 sm:px-4 mt-2" 
+              initial={{ opacity: 0 }} 
+              whileInView={{ opacity: 1 }} 
+              transition={{ duration: 0.8 }} 
+              viewport={{ once: true }}
+            >
+              <div className="w-full max-w-7xl mx-auto">
+                <motion.h2 
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-8 md:mb-12 gradient-text" 
+                  initial={{ y: 30, opacity: 0 }} 
+                  whileInView={{ y: 0, opacity: 1 }} 
+                  transition={{ duration: 0.6 }} 
+                  viewport={{ once: true }}
+                >
+                  منتجات مشابهة
+                </motion.h2>
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                  {upsaleProducts.slice(0, upsaleDisplayCount).map((product) => (
+                    <ProductCard key={product.id} product={product} typeId={product.product_type_id} />
+                  ))}
+                </div>
+                
+                {shouldShowUpsaleMoreButton && (
+                  <div className="text-center mt-8 md:mt-12">
+                    <Button onClick={handleUpsaleShowMore} className="btn-gradient">
+                      عرض المزيد
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </motion.section>
+          )}
+
       </main>
 
       <ImageLightbox

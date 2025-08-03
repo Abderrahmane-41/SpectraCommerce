@@ -291,7 +291,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         const productData = {
             name: productName.trim(),
-            description: description.trim(),
+            description: description,
             base_price: formatPriceForDb(basePrice) || 0, // Apply helper
             price_before_discount: formatPriceForDb(priceBeforeDiscount), // Apply helper
             product_type_id: productTypeId,
@@ -464,7 +464,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             <div>
                 <label className="block text-sm font-medium mb-2">الوصف</label>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="وصف المنتج..." rows={3} />
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="...وصف المنتج" rows={4} style={{ whiteSpace: 'pre-wrap' }}/>
             </div>
           
           <div>
@@ -523,6 +523,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     placeholder=" ...اكتب وصف المنتج"
                     value={block.content}
                     onChange={(e) => handleBlockChange(index, e.target.value)}
+                    style={{ whiteSpace: 'pre-wrap' }}
                   />
                 ) : (
                   <div className="flex-grow">
