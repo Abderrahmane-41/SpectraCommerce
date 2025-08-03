@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Info, ShoppingCart } from 'lucide-react';
 import { useProductById, useReviews, useOrders, Product } from '../hooks/useProductData';
 import { useShippingData } from '../hooks/useShippingData';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -17,6 +17,7 @@ import OrderSuccessModal from '../components/OrderSuccessModal';
 import { Button } from '../components/ui/button';
 import ProductCard from '../components/ProductCard';
 import { useProducts } from '../hooks/useSupabaseStore';
+import HowToOrder from '@/components/HowToOrder.tsx';
 
 
 // Update the ImageSlide component near the top of the file
@@ -93,6 +94,8 @@ const ProductPage = () => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const howToOrderRef = useRef<HTMLElement>(null);
+  
   const [wilaya, setWilaya] = useState('');
   const [commune, setCommune] = useState('');
   const [shipToHome, setShipToHome] = useState(false);
@@ -151,6 +154,10 @@ const ProductPage = () => {
   //     });
   //   }
   // }, [product]);
+
+  const scrollToHowToOrder = () => {
+    howToOrderRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const scrollToOrder = () => {
     OrderRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -796,9 +803,20 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
           </motion.div>
         )}
 
+          {/* How to Order Section */}
+                  <motion.section ref={howToOrderRef} className="py-4 sm:py-6 md:py-12 px-3 sm:px-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+                    <div className="w-full max-w-7xl mx-auto">
+                      <motion.h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-8 sm:mb-12 gradient-text" initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>كيفية الطلب</motion.h2>
+                      <HowToOrder />
+                    </div>
+                  </motion.section>
+                  
+                  {/* Sticky Scroll Button */}
+                  <motion.button onClick={scrollToHowToOrder} className="fixed bottom-3 left-3 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2" aria-label="كيفية الطلب" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1, type: 'spring' }}><Info className="w-6 h-6" /></motion.button>
+
         {upsaleProducts.length > 0 && (
             <motion.section 
-              className="py-6 sm:py-8 md:py-12 px-3 sm:px-4 mt-2" 
+              className="py-4 sm:py-6 md:py-8 px-3 sm:px-4 mt-2" 
               initial={{ opacity: 0 }} 
               whileInView={{ opacity: 1 }} 
               transition={{ duration: 0.8 }} 

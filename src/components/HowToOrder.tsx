@@ -48,7 +48,7 @@ const HowToOrder = () => {
               <h3 className="font-bold text-base sm:text-lg md:text-xl text-foreground mb-1">
                 {step.title}
               </h3>
-              <p className="text-sm sm:text-base text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground font-semibold">
                 {step.description}
               </p>
             </div>

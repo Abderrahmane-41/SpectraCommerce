@@ -136,7 +136,7 @@ const ProductsPage = () => {
                 </div>
             </motion.div>
             {/* How to Order Section */}
-      <motion.section ref={howToOrderRef} className="py-0 sm:py-16 md:py-20 px-3 sm:px-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+      <motion.section ref={howToOrderRef} className="py-0 sm:py-3 md:py-5 px-3 sm:px-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
         <div className="w-full max-w-7xl mx-auto">
           <motion.h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-8 sm:mb-12 gradient-text" initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>كيفية الطلب</motion.h2>
           <HowToOrder />
