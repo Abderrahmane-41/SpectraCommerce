@@ -28,8 +28,8 @@ const Index = () => {
   const [productTypeSearchTerm, setProductTypeSearchTerm] = useState('');
   const [productSearchTerm, setProductSearchTerm] = useState('');
   const [searchPrice, setSearchPrice] = useState('');
-  const [searchColor, setSearchColor] = useState('');
-  const [searchSize, setSearchSize] = useState('');
+  const [searchColor] = useState('');
+  const [searchSize] = useState('');
   const [searchDiscount, setSearchDiscount] = useState('');
   const [displayCount, setDisplayCount] = useState(0);
 
@@ -130,15 +130,24 @@ const Index = () => {
       </motion.section>
 
       {/* How to Order Section */}
-      <motion.section ref={howToOrderRef} className="py-0 sm:py-16 md:py-20 px-3 sm:px-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
-        <div className="w-full max-w-7xl mx-auto">
-          <motion.h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-8 sm:mb-12 gradient-text" initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>كيفية الطلب</motion.h2>
-          <HowToOrder />
-        </div>
-      </motion.section>
-      
-      {/* Sticky Scroll Button */}
-      <motion.button onClick={scrollToHowToOrder} className="fixed bottom-3 left-3 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2" aria-label="كيفية الطلب" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1, type: 'spring' }}><Info className="w-6 h-6" /></motion.button>
+        {/* Replace the motion.section with regular div */}
+        <section ref={howToOrderRef} className="py-0 sm:py-16 md:py-20 px-3 sm:px-4 fade-in">
+          <div className="w-full max-w-7xl mx-auto">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-8 sm:mb-12 gradient-text fade-in">
+              كيفية الطلب
+            </h2>
+            <HowToOrder />
+          </div>
+        </section>
+
+        {/* Replace motion button with regular button + CSS animations */}
+        <button 
+          onClick={scrollToHowToOrder} 
+          className="fixed bottom-3 left-3 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center gap-2 scale-in" 
+          aria-label="كيفية الطلب"
+        >
+          <Info className="w-6 h-6" />
+        </button>
     </>
   );
 };

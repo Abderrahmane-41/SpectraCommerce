@@ -230,111 +230,108 @@ const updateProductInventory = async (productId: string, quantityChange: number)
       console.error("Failed to create order in Supabase:", error);
       return null;
     }
-    const isDevelopment = process.env.NODE_ENV === 'development';
 
     // 2. Sync to Google Sheets if URL is provided
     if (gsheetUrl && createdOrder) {
-      try {
-    console.log('📊 Starting Google Sheets sync...', { gsheetUrl });
+        syncToGoogleSheetsBackground(createdOrder, gsheetUrl);
 
-        const { data: product } = await supabase.from('products').select('product_type_id, name').eq('id', createdOrder.product_id).single();
-        const { data: productType } = await supabase.from('product_types').select('name').eq('id', product?.product_type_id).single();
-
-        const statusTranslations: { [key: string]: string } = {
-        pending: 'En attente', 
-        confirmed: 'Confirmée', 
-        processing: 'En cours', 
-        shipped: 'Expédiée', 
-        delivered: 'Livrée', 
-        cancelled: 'Annulée', 
-        returned: 'Retournée',
-      };
-
-        const payload = {
-        created_at: new Date(createdOrder.created_at).toLocaleString('fr-FR'),
-        productTypeName: productType?.name || 'N/A',
-        product_name: product?.name,
-        quantity: createdOrder.quantity,
-        size: createdOrder.size,
-        color: createdOrder.color,
-        total_price: `${createdOrder.total_price} DZD`,
-        customer_name: createdOrder.customer_name,
-        customer_phone: createdOrder.customer_phone,
-        wilaya: createdOrder.wilaya,
-        commune: createdOrder.commune,
-        full_address: createdOrder.full_address,
-        status: statusTranslations[createdOrder.status] || createdOrder.status,
-      };
-
-      console.log('📤 Sending payload to Google Sheets:', payload);
-      console.log('🔗 Google Sheets URL:', gsheetUrl);
-
-
-        await fetch(gsheetUrl, { 
-        method: 'POST', 
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload) 
-      });
-
-            console.log('📡 Google Sheets response sent (no-cors mode)');
-
-
-
-            try {
-        const testResponse = await fetch(gsheetUrl, { 
-          method: 'POST', 
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload) 
-        });
-        
-        const responseText = await testResponse.text();
-        console.log('📋 Google Sheets response:', responseText);
-        
-        if (testResponse.ok) {
-          console.log('✅ Google Sheets sync successful');
-        } else {
-          console.error('❌ Google Sheets sync failed:', testResponse.status, responseText);
-        }
-      } catch (corsError) {
-        console.log('🔒 CORS prevented reading response, but request may have succeeded');
-        console.log('CORS Error (expected):', corsError);
-      }
-
-
-        // 3. Update the sync status in Supabase
-        const { data: updatedOrder } = await supabase.from('orders').update({ is_synced_to_gsheet: true }).eq('id', createdOrder.id).select().single();
-        
-        // Update local state with the synced status
-        if (updatedOrder) {
-        const typedUpdatedOrder: Order = {
-          ...updatedOrder,
-          status: (updatedOrder.status as 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned') || 'pending',
-          product_id: updatedOrder.product_id || '',
-          quantity: updatedOrder.quantity || 1,
-          ip_address: updatedOrder.ip_address || undefined,
-          order_time: updatedOrder.order_time || undefined,
-          is_synced_to_gsheet: updatedOrder.is_synced_to_gsheet || false
-        } as Order;
-        
-        setOrders(prev => prev.map(o => o.id === typedUpdatedOrder.id ? typedUpdatedOrder : o));
-                console.log('✅ Order sync status updated in database');
-
-      }
-        
-        
-      } catch (syncError) {
-      console.error("❌ Google Sheets sync failed:", syncError);
-      }
-    }else {
-    console.log('⏭️ Skipping Google Sheets sync (no URL provided)');
-  }
+    }
+      
     return createdOrder;
   };
+
+  // 🔄 BACKGROUND GOOGLE SHEETS SYNC FUNCTION
+const syncToGoogleSheetsBackground = async (order: Order, gsheetUrl: string) => {
+  try {
+    console.log('📊 Starting background Google Sheets sync...', { orderId: order.id });
+
+    // Fetch additional data for Google Sheets
+    const [productResult] = await Promise.all([
+      supabase.from('products').select('product_type_id, name').eq('id', order.product_id).single(),
+      // We'll get product type after we have product_type_id
+    ]);
+
+    const product = productResult.data;
+    let productType = null;
+    
+    if (product?.product_type_id) {
+      const productTypeResult = await supabase
+        .from('product_types')
+        .select('name')
+        .eq('id', product.product_type_id)
+        .single();
+      productType = productTypeResult.data;
+    }
+
+    const statusTranslations: { [key: string]: string } = {
+      pending: 'En attente', 
+      confirmed: 'Confirmée', 
+      processing: 'En cours', 
+      shipped: 'Expédiée', 
+      delivered: 'Livrée', 
+      cancelled: 'Annulée', 
+      returned: 'Retournée',
+    };
+
+    const payload = {
+      created_at: new Date(order.created_at).toLocaleString('fr-FR'),
+      productTypeName: productType?.name || 'N/A',
+      product_name: product?.name || 'N/A',
+      quantity: order.quantity,
+      size: order.size,
+      color: order.color,
+      total_price: `${order.total_price} DZD`,
+      customer_name: order.customer_name,
+      customer_phone: order.customer_phone,
+      wilaya: order.wilaya,
+      commune: order.commune,
+      full_address: order.full_address,
+      status: statusTranslations[order.status] || order.status,
+    };
+
+    console.log('📤 Sending payload to Google Sheets (background):', payload);
+
+    // ✅ SINGLE FETCH REQUEST - NO CORS TEST
+    await fetch(gsheetUrl, { 
+      method: 'POST', 
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload) 
+    });
+
+    console.log('📡 Google Sheets sync completed (background)');
+
+    // ✅ UPDATE SYNC STATUS IN DATABASE (BACKGROUND)
+    const { data: updatedOrder } = await supabase
+      .from('orders')
+      .update({ is_synced_to_gsheet: true })
+      .eq('id', order.id)
+      .select()
+      .single();
+    // Update local state with the synced status
+    if (updatedOrder) {
+      const typedUpdatedOrder: Order = {
+        ...updatedOrder,
+        status: (updatedOrder.status as 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned') || 'pending',
+        product_id: updatedOrder.product_id || '',
+        quantity: updatedOrder.quantity || 1,
+        ip_address: updatedOrder.ip_address || undefined,
+        order_time: updatedOrder.order_time || undefined,
+        is_synced_to_gsheet: updatedOrder.is_synced_to_gsheet || false
+      } as Order;
+      
+      setOrders(prev => prev.map(o => o.id === typedUpdatedOrder.id ? typedUpdatedOrder : o));
+      console.log('✅ Order sync status updated in database (background)');
+    }
+    
+  } catch (syncError) {
+    console.error("❌ Google Sheets background sync failed:", syncError);
+    // Optionally, you could implement a retry mechanism here
+    // or mark the order for manual sync in the admin panel
+  }
+};
 
   useEffect(() => {
     fetchOrders();
