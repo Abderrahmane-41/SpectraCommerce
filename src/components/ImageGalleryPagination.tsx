@@ -1,8 +1,8 @@
 
-import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { cn } from '@/lib/utils';
+import { optimizeCloudinaryUrl } from '@/utils/imageUtils';
+
 
 interface ImageGalleryPaginationProps {
   images: string[];
@@ -51,9 +51,10 @@ const ImageGalleryPagination = ({
               `}
             >
               <img 
-                src={image} 
+                src={optimizeCloudinaryUrl(image, 100)} 
                 alt={`${productName} - صورة ${index + 1}`} 
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
           </div>

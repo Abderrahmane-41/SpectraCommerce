@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import ImageLightbox from './ImageLightbox';
 import { Product ,useProductTypes} from '@/hooks/useSupabaseStore'; // Import the Product type
+import { optimizeCloudinaryUrl } from '@/utils/imageUtils';
+
 
 
 interface ProductCardProps {
@@ -17,8 +19,9 @@ const ProductCard = ({ typeId, product }: ProductCardProps) => {
   const { productTypes } = useProductTypes(); // Use the hook to get all product types
 
 
-  const mainImageUrl = product.images?.[0] || '/placeholder.svg';
-  const productType = productTypes.find(type => type.id === typeId);
+  const rawMainImageUrl = product.images?.[0] || '/placeholder.svg';
+  const mainImageUrl = optimizeCloudinaryUrl(rawMainImageUrl, 400);
+    const productType = productTypes.find(type => type.id === typeId);
   const productTypeName = productType?.name || '';
   
   // Create a truncated description (limit to 50 characters)
@@ -55,6 +58,7 @@ const ProductCard = ({ typeId, product }: ProductCardProps) => {
                 src={mainImageUrl}
                 alt={product.name}
                 className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-110"
+                loading="lazy"
               />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
@@ -104,7 +108,7 @@ const ProductCard = ({ typeId, product }: ProductCardProps) => {
       <ImageLightbox
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
-        src={mainImageUrl}
+        src={optimizeCloudinaryUrl(rawMainImageUrl, 1600)}
         alt={product.name}
       />
     </>

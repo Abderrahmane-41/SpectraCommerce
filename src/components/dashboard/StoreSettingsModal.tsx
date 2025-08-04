@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { optimizeCloudinaryUrl } from '@/utils/imageUtils';
 
 interface StoreSettingsModalProps {
   isOpen: boolean;
@@ -136,7 +137,7 @@ const StoreSettingsModal = ({ isOpen, onClose }: StoreSettingsModalProps) => {
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                       {formData.hero_images?.map((image, index) => (
                         <div key={index} className="relative group">
-                          <img src={image} alt={`Hero ${index + 1}`} className="w-full h-24 object-cover rounded-lg border" />
+                          <img src={optimizeCloudinaryUrl(image, 200)} alt={`Hero ${index + 1}`} className="w-full h-24 object-cover rounded-lg border" loading='lazy' />
                           <button type="button" onClick={() => removeHeroImage(index)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-3 opacity-100 transition-opacity"><X className="w-3 h-3" /></button>
                         </div>
                       ))}

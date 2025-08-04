@@ -98,7 +98,8 @@ const Index = () => {
             <motion.p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-6 text-muted-foreground max-w-3xl mx-auto leading-relaxed" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>أفضل المنتجات بأفضل الأسعار - التوصيل متوفر 58 ولاية</motion.p>
         </div>
         <div className="w-full">
-           <GenericCarousel items={heroImages} slideClassName="w-full" renderSlide={(image) => <HeroImageCard imageUrl={image.url} />} />
+           <GenericCarousel items={heroImages} slideClassName="w-full"     renderSlide={(image, index) => <HeroImageCard imageUrl={image.url} index={index} />} 
+ />
         </div>
       </motion.section>
       

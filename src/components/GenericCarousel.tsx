@@ -10,7 +10,7 @@ import Autoplay from 'embla-carousel-autoplay'; // Import Autoplay plugin
 // Define the shape of your props
 interface GenericCarouselProps<T> {
   items: T[];
-  renderSlide: (item: T) => React.ReactNode;
+  renderSlide: (item: T, index?: number) => React.ReactNode;
   // This new optional prop will control the slide width
   slideClassName?: string; 
   // Optional prop to enable/disable autoplay and customize delay
@@ -71,7 +71,8 @@ const GenericCarousel = <T extends { id: string | number }>({
               style={slideStyles[index]}
               transition={{ type: 'spring', stiffness: 200, damping: 30 }}
             >
-              {renderSlide(item)}
+            {typeof renderSlide === 'function' ? renderSlide(item, index) : null}
+
             </motion.div>
           ))}
         </div>

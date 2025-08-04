@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart as ShoppingCartIcon, X, Plus, Minus, Trash2 } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '@/utils/imageUtils';
 
 interface CartItem {
   id: string;
@@ -108,7 +109,7 @@ const ShoppingCart = () => {
                     animate={{ opacity: 1, y: 0 }}
                   >
                     <img
-                      src={item.image}
+                      src={optimizeCloudinaryUrl(item.image, 200)}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />

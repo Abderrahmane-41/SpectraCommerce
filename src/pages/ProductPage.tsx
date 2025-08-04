@@ -18,13 +18,18 @@ import { Button } from '../components/ui/button';
 import ProductCard from '../components/ProductCard';
 import { useProducts ,useOrders} from '../hooks/useSupabaseStore';
 import HowToOrder from '@/components/HowToOrder.tsx';
+import { optimizeCloudinaryUrl } from '@/utils/imageUtils';
 
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 
 
 
 // Update the ImageSlide component near the top of the file
-const ImageSlide = ({ imageUrl, alt, onImageClick }: { imageUrl: string, alt: string, onImageClick: () => void }) => (
+const ImageSlide = ({ imageUrl, alt, onImageClick }: { imageUrl: string, alt: string, onImageClick: () => void }) => {
+    // Main product images use w_800
+    const optimizedUrl = optimizeCloudinaryUrl(imageUrl, 800);
+    
+    return (
     <div className="relative p-[2px]">
         {/* Gradient border wrapper */}
         <div className="absolute inset-0 rounded-lg bg-gradient-primary dark:bg-gradient-primary-dark"></div>
@@ -32,13 +37,15 @@ const ImageSlide = ({ imageUrl, alt, onImageClick }: { imageUrl: string, alt: st
         {/* Image content */}
         <div className="aspect-square bg-background rounded-lg overflow-hidden relative cursor-zoom-in z-10" onClick={onImageClick}>
             <img
-                src={imageUrl}
+                src={optimizedUrl}
                 alt={alt}
                 className="w-full h-full object-contain"
+                // Main product image should load eagerly
+                loading="eager"
             />
         </div>
     </div>
-);
+)};
 
 // src/pages/ProductPage.tsx (add this section)
 
@@ -769,7 +776,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                     <div key={index} className="my-4">
                       <div className="flex justify-end">
                         <img 
-                          src={block.content} 
+                          src={optimizeCloudinaryUrl(block.content, 800)} 
                           alt={`تفاصيل المنتج ${index + 1}`} 
                           className="w-full h-70 sm:w-3/4 lg:w-1/2 rounded-lg shadow-md object-cover"
                           loading="lazy"
@@ -860,7 +867,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
       </main>
 
       <ImageLightbox
-        src={product.images?.[currentImageIndex] || '/placeholder.svg'}
+        src={optimizeCloudinaryUrl(product.images?.[currentImageIndex] || '', 1600)}
         alt={product.name}
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
