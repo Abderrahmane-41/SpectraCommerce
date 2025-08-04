@@ -202,19 +202,16 @@ export function GoogleSheetSettingsTab() {
                     <div className="p-4 overflow-x-auto">
                       <pre className="text-xs font-mono text-foreground whitespace-pre-wrap" dir="ltr">
 {`// غير هذا الرابط إلى رابط جدول البيانات الخاص بك
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1OqEx7aDweDeZecJ8nLFZDB3tfAFTLxoFli8D3iahMXI/edit?gid=0#gid=0";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit";
 const SHEET_NAME = "Sheet1"; // غير الإسم إذا كان مختلفاً
 
 function doPost(e) {
-    console.log('doPost function called');
-    
     try {
         // Open the spreadsheet by URL
         const sheets = SpreadsheetApp.openByUrl(SHEET_URL);
         const sheet = sheets.getSheetByName(SHEET_NAME);
         
         if (!sheet) {
-            console.error('Sheet not found:', SHEET_NAME);
             return ContentService
                 .createTextOutput(JSON.stringify({ "status": "error", "message": "Sheet not found: " + SHEET_NAME }))
                 .setMimeType(ContentService.MimeType.JSON);
@@ -225,91 +222,87 @@ function doPost(e) {
         // Handle both e.parameter and e.postData.contents
         if (e.parameter && Object.keys(e.parameter).length > 0) {
             data = e.parameter;
-            console.log('Using e.parameter:', data);
         } else if (e.postData && e.postData.contents) {
             data = JSON.parse(e.postData.contents);
-            console.log('Using e.postData.contents:', data);
         } else {
-            console.error('No data received');
             return ContentService
                 .createTextOutput(JSON.stringify({ "status": "error", "message": "No data received" }))
                 .setMimeType(ContentService.MimeType.JSON);
         }
 
+        // Function to fix phone number formatting (preserve leading 0 and + signs)
+        function formatPhoneNumber(phone) {
+            if (!phone) return 'غير محدد';
+            const phoneStr = phone.toString();
+            return "'" + phoneStr; // Add single quote prefix to force text treatment
+        }
+
+        // Function to fix mixed language text direction
+        function fixMixedLanguageText(text) {
+            if (!text) return 'غير محدد';
+            return '\u202B' + text + '\u202C'; // Add Unicode RTL markers
+        }
+
         // Check if headers exist, if not create them
         if (sheet.getRange("A1").getValue() === "") {
-            console.log('Adding headers...');
             const headers = [ 
-                "Date", "Product Type", "Product Name", "Quantity", 
-                "Size", "Color", "Total Price", "Customer Name", 
-                "Customer Phone", "Wilaya", "Commune", "Full Address", "Status" 
+                "التاريخ", "نوع المنتج", "اسم المنتج", "الكمية", 
+                "المقاس", "اللون", "السعر الإجمالي", "اسم العميل", 
+                "رقم الهاتف", "الولاية", "البلدية", "العنوان الكامل", "الحالة" 
             ];
             sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
             sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+            sheet.getRange(1, 1, 1, headers.length).setHorizontalAlignment('center');
         }
         
-        // Add the new row
+        // Create the row data with proper formatting
         const newRow = [
-            data.created_at || new Date().toLocaleString('fr-FR'),
-            data.productTypeName || 'N/A',
-            data.product_name || 'N/A',
-            data.quantity || 'N/A',
-            data.size || 'N/A',
-            data.color || 'N/A',
-            data.total_price || 'N/A',
-            data.customer_name || 'N/A',
-            data.customer_phone || 'N/A',
-            data.wilaya || 'N/A',
-            data.commune || 'N/A',
-            data.full_address || 'N/A',
-            data.status || 'N/A'
+            data.created_at || new Date().toLocaleString('ar-DZ'),
+            data.productTypeName || 'غير محدد',
+            data.product_name || 'غير محدد',
+            data.quantity || 1,
+            data.size || 'لا يوجد',
+            data.color || 'لا يوجد',
+            data.total_price || '0 DZD',
+            data.customer_name || 'غير محدد',
+            formatPhoneNumber(data.customer_phone),
+            data.wilaya || 'غير محدد',
+            data.commune || 'غير محدد',
+            fixMixedLanguageText(data.full_address),
+            data.status || 'قيد الانتظار'
         ];
         
-        console.log('Adding row:', newRow);
-        sheet.appendRow(newRow);
+        // Add the row and apply proper formatting
+        const lastRow = sheet.getLastRow() + 1;
+        sheet.getRange(lastRow, 1, 1, newRow.length).setValues([newRow]);
         
-        console.log('Row added successfully');
+        // Format specific columns to preserve data integrity
+        const phoneCell = sheet.getRange(lastRow, 9);
+        phoneCell.setNumberFormat('@'); // Text format for phone number
+        
+        const addressCell = sheet.getRange(lastRow, 12);
+        addressCell.setNumberFormat('@'); // Text format for address
+        addressCell.setHorizontalAlignment('right'); // Right align for Arabic
+        
+        // Set right-to-left text direction for Arabic content columns
+        const arabicColumns = [1, 2, 3, 5, 6, 8, 10, 11, 12, 13];
+        arabicColumns.forEach(col => {
+            const cell = sheet.getRange(lastRow, col);
+            cell.setHorizontalAlignment('right');
+        });
+        
         return ContentService
             .createTextOutput(JSON.stringify({ "status": "success", "message": "Data added successfully" }))
             .setMimeType(ContentService.MimeType.JSON);
             
     } catch (error) {
-        console.error('Error in doPost:', error.toString());
         return ContentService
             .createTextOutput(JSON.stringify({ 
                 "status": "error", 
-                "message": error.toString(),
-                "stack": error.stack || 'No stack trace available'
+                "message": error.toString()
             }))
             .setMimeType(ContentService.MimeType.JSON);
     }
-}
-
-// Test function
-function testFunction() {
-    const testData = {
-        created_at: new Date().toLocaleString('fr-FR'),
-        productTypeName: 'Test Type',
-        product_name: 'Test Product',
-        quantity: 1,
-        size: 'M',
-        color: 'Blue',
-        total_price: '100 DZD',
-        customer_name: 'Test Customer',
-        customer_phone: '+213123456789',
-        wilaya: 'Algiers',
-        commune: 'Bab Ezzouar',
-        full_address: 'Test Address',
-        status: 'En attente'
-    };
-    
-    const mockEvent = {
-        postData: {
-            contents: JSON.stringify(testData)
-        }
-    };
-    
-    return doPost(mockEvent);
 }`}
                       </pre>
                     </div>
@@ -445,7 +438,7 @@ function testFunction() {
                 <span>
                       إن لم يعمل الكود شاهد هذا الفيديو لتفهم أكثر{' '}
                   <a 
-                    href="https://drive.google.com/file/your-video-link-here/view" 
+                    href="https://drive.google.com/file/d/1f7HY0VmIHMX7VLU7ks4wX9ZcGDJCzAu6/view?usp=sharing&t=9" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
