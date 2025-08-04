@@ -70,8 +70,28 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      <Helmet>
-        {/* Favicons etc. handled by index.html for static, or Dashboard.tsx for dynamic in admin */}
+        <Helmet>
+        {/* Dynamic Favicon based on store logo */}
+              <title>{settings?.store_name || 'متجر الكتروني'}</title>
+              {settings?.logo_url && (
+                <>
+                  {/* Modern browsers - multiple formats */}
+                  <link rel="icon" type="image/png" sizes="32x32" href={settings.logo_url} />
+                  <link rel="icon" type="image/png" sizes="16x16" href={settings.logo_url} />
+                  <link rel="icon" type="image/jpeg" href={settings.logo_url} />
+                  
+                  {/* iOS support */}
+                  <link rel="apple-touch-icon" href={settings.logo_url} />
+                  
+                  {/* Force favicon refresh with timestamp */}
+                  <link rel="shortcut icon" href={`${settings.logo_url}?v=${Date.now()}`} />
+                </>
+              )}
+              
+              {/* Meta tags for SEO */}
+              <meta property="og:title" content={settings?.store_name || 'متجر الكتروني'} />
+              <meta property="og:image" content={settings?.logo_url || '/favicon-32x32.png'} />
+              <meta name="twitter:image" content={settings?.logo_url || '/favicon-32x32.png'} />
       </Helmet>
       <Navbar />
       <main className="flex-grow">
