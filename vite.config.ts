@@ -28,7 +28,14 @@ export default defineConfig(({ mode }) => ({
           router: ['react-router-dom'],
           ui: ['framer-motion', 'lucide-react'],
           supabase: ['@supabase/supabase-js'],
+          // Split large dependencies
+          tanstack: ['@tanstack/react-query'],
+          embla: ['embla-carousel-react'],
         },
+        // Ensure hashed filenames for better caching
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
       },
     },
     // Compress assets
