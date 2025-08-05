@@ -8,6 +8,9 @@ import { StoreSettingsProvider } from './contexts/StoreSettingsContext';
 import { HelmetProvider } from 'react-helmet-async';
 import { Suspense, lazy } from 'react'; // ✅ ADD SUSPENSE AND LAZY
 import LoadingSpinner from './components/LoadingSpinner'; // ✅ ADD LOADING COMPONENT
+import AboutUsPage from './pages/AboutUsPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 // ✅ LAZY LOAD ALL PAGES
 const Index = lazy(() => import('./pages/Index'));
@@ -64,6 +67,10 @@ function App() {
                     />
                     <Route path="/auth" element={<AuthPage />} />
                     <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
+                    <Route path="/about" element={<AboutUsPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
+        
                   </Routes>
                 </Suspense>
                 <Toaster />
