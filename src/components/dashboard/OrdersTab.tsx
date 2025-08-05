@@ -7,7 +7,7 @@ import OrderFilterModal from './OrderFilterModal';
 import { toast } from 'sonner';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { format } from 'date-fns';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { MobileTooltip } from "@/components/MobileTooltip";
 import { AlertTriangle } from "lucide-react";
 
 
@@ -330,35 +330,43 @@ const OrdersTab = () => {
                     <span className="font-semibold text-sm sm:text-base">تفاصيل العميل</span>
                   </div>
                   <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-end items-center">
                         {/* This is the new part for the icon */}
-                        <div className="flex items-center gap-2">
-                            {!order.is_synced_to_gsheet && (
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <AlertTriangle className="w-4 h-4 text-destructive" />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>هذه الطلبية لم تتم مزامنتها مع جوجل شيتس.</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            )}
-                            <span className="font-bold">{order.customer_name}</span>
-                        </div>
+                       <div className="flex items-center gap-2">
+                          {!order.is_synced_to_gsheet && (
+                            <div className="mr-1">
+                              <MobileTooltip
+                                content={
+                                  <p className="max-w-[200px] text-sm">هذه الطلبية لم تتم مزامنتها مع جوجل شيتس.</p>
+                                }
+                              >
+                                <AlertTriangle className="w-6 h-6 text-destructive cursor-pointer" />
+                              </MobileTooltip>
+                            </div>
+                          )}
+                          
+                      </div>
+                      <span className="font-bold ">{order.customer_name}</span>
                         {/* This part remains the same */}
                         <strong className="ml-2"> : الإسم</strong>
-                    </div>
-                                   <div className="flex items-center space-x-2">
-                      <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <a href={`tel:${order.customer_phone}`} className="hover:underline">{order.customer_phone}</a>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5" />
+                </div>
+                          
+                    <div className="flex items-center justify-between space-x-2 ">
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <p className="text-muted-foreground text-xs font-semibold" >أنقر للإتصال   <span className="ml-3    ">→</span></p>
+                    <span className="font-semibold text-sm sm:text-base"> 
+                      
+                      <a href={`tel:${order.customer_phone}`} className="hover:underline ">{order.customer_phone}</a>
+                    <strong className="ml-2"> : 
+                    رقم الهاتف</strong>
+
+                    </span>
+                  </div>
+                    <div className="flex space-y-3 sm:space-y-2 items-start space-x-2">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mt-3" />
                       <div>
                         <p>{order.wilaya}, {order.commune}</p>
-                        <p className="text-muted-foreground text-xs">{order.full_address}</p>
+                        <p className="text-muted-foreground text-xs font-semibold">{order.full_address}</p>
                       </div>
                     </div>
                   </div>
@@ -552,7 +560,7 @@ const calculateTotalProfit = () => {
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-semibold">إجمالي الأرباح</h3>
-                <p className="text-xs text-muted-foreground font-semibold">
+                <p className="text-xs text-foreground font-medium">
                   {activeFiltersCount > 0 ? 'مصفاة' : 'كل الطلبات'}
                 </p>
               </div>

@@ -97,16 +97,16 @@ export function GoogleSheetsDebug() {
   };
 
   return (
-    <div className="relative p-[3px]">
+    <div className="relative p-[3px] ">
       <div className="absolute inset-0 rounded-xl bg-gradient-primary dark:bg-gradient-primary-dark"></div>
-      <Card className="relative z-10 bg-card dark:bg-card rounded-xl border-0">
+      <Card className="relative z-10  bg-card dark:bg-card rounded-xl border-0">
         <CardHeader>
-          <CardTitle className="text-right gradient-text text-xl font-bold">
+          <CardTitle className="text-right mb-0 gradient-text text-xl font-bold">
             اختبار Google Sheets
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4" dir="rtl">
-          <div className="flex gap-3 justify-start">
+          <div className="flex gap-3 justify-start mt-0">
             <Button 
               onClick={testGoogleSheetsConnection} 
               disabled={isLoading}

@@ -135,7 +135,7 @@ const FacebookPixelSettingsTab = () => {
                 {isSaving ? (
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                    <span>جاري الحفظ...</span>
+                    <span>...جاري الحفظ</span>
                   </div>
                 ) : (
                   'حفظ التغييرات'
@@ -151,7 +151,7 @@ const FacebookPixelSettingsTab = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="relative p-[3px]"
+        className="relative p-[3px] "
       >
         <div className="absolute inset-0 rounded-xl bg-gradient-primary dark:bg-gradient-primary-dark"></div>
         <Card className="relative z-10 bg-card dark:bg-card rounded-xl border-0">
@@ -161,10 +161,10 @@ const FacebookPixelSettingsTab = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="glass-effect rounded-lg">
-            <ol className="space-y-4 text-right" style={{ listStylePosition: 'inside' }}>
-              <li className="leading-relaxed flex items-start">
-                <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
-                  ۱
+            <ol className="space-y-4 text-right " style={{ listStylePosition: 'inside' }}>
+              <li className="leading-relaxed flex items-start ">
+                <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 mr-0 flex-shrink-0">
+                  1
                 </span>
                 <span>انتقل إلى{' '}
                   <a 
@@ -180,21 +180,21 @@ const FacebookPixelSettingsTab = () => {
               
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
-                  ۲
+                  2
                 </span>
                 <span>اختر البيكسل الخاص بك من القائمة</span>
               </li>
               
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
-                  ۳
+                  4
                 </span>
                 <span>انسخ معرف البيكسل من الإعدادات والصقه في الحقل أعلاه</span>
               </li>
               
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
-                  ۴
+                  5
                 </span>
                 <span>تأكد من أن المعرف يتكون من 15-16 رقماً فقط</span>
               </li>
