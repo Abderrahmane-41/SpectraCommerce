@@ -13,7 +13,7 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
-import DashboardMobileMenu from '../components/dashboard/DashboardMobileMenu';
+import MobileMenu from '@/components/MobileMenu';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Helmet } from 'react-helmet-async';
@@ -63,7 +63,7 @@ const Dashboard = () => {
     </>
   )}
 </Helmet>
-      <Navbar>
+      <Navbar isDashboard={true}>
         <motion.button
           onClick={() => setIsMenuOpen(true)}
           className="p-1.5 sm:p-2 rounded-lg glass-effect hover:bg-white/20 dark:hover:bg-black/20 transition-colors"
@@ -152,16 +152,18 @@ const Dashboard = () => {
         onClose={() => setIsPasswordResetOpen(false)}
       />
 
-      <DashboardMobileMenu
+      <MobileMenu
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
         onLogout={handleLogout}
         onPasswordReset={() => {
-            setIsMenuOpen(false);
-            setIsPasswordResetOpen(true);
+          setIsMenuOpen(false);
+          setIsPasswordResetOpen(true);
         }}
         setActiveTab={setActiveTab}
         activeTab={activeTab}
+        menuType="dashboard"
+        storeName={settings?.store_name}
 
       />
     </div>

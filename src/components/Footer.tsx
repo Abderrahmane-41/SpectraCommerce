@@ -2,11 +2,16 @@ import { Facebook, Instagram, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
+import { useEffect } from 'react';
 
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { settings, loading: settingsLoading } = useStoreSettings();
+
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
   
 
   return (
@@ -79,7 +84,7 @@ const Footer = () => {
         
         {/* Copyright */}
         <div className="border-t border-border mt-4 pt-4 pb-5 mb-5 text-center text-sm text-muted-foreground">
-          <p>&copy; {currentYear}  <p className='gradient-text'>{settings?.store_name || 'متجر الكتروني '}</p> جميع الحقوق محفوظة.</p>
+          <p>&copy; {currentYear}  <span className='gradient-text'>{settings?.store_name || 'متجر الكتروني '}</span> جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>

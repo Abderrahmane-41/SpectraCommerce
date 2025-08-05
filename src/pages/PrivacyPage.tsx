@@ -17,17 +17,8 @@ const PrivacyPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="max-w-4xl mx-auto px-4 pt-12 md:pt-20 pb-4 md:pb-8" >
-        {/* Back button */}
-        <div className="mb-8 ">
-          <Link 
-            to="/" 
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            العودة إلى الرئيسية
-          </Link>
-        </div>
+      <main className="max-w-4xl mx-auto px-4 pt-20 md:pt-20 pb-4 md:pb-8" >
+        
 
         {/* Header */}
         <motion.div 

@@ -8,6 +8,14 @@ import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async'; // Import Helmet
 
+// Define custom window interface for Facebook Pixel
+declare global {
+  interface Window {
+    fbq: any;
+    _fbq: any;
+  }
+}
+
 interface MainLayoutProps {
   children: React.ReactNode;
 }
@@ -22,49 +30,56 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   }, [settings]);
 
   // Inject Facebook Pixel base code
-  useEffect(() => {
-    if (settings?.facebook_pixel_id) {
-      const pixelId = settings.facebook_pixel_id;
+  // Update the Facebook Pixel implementation section
 
-      // Check if the script already exists to prevent re-injection
-      if (document.getElementById('facebook-pixel-script')) {
-        // If it exists and pixelId has changed, reinitialize or reload
-        if ((window as any).fbq) {
-          (window as any).fbq('init', pixelId);
-          (window as any).fbq('track', 'PageView');
-        }
+  // Inject Facebook Pixel base code
+  useEffect(() => {
+    if (!settings?.facebook_pixel_id || settings.facebook_pixel_id.trim() === '') {
+      return; // Exit early if pixel ID is not set
+    }
+    
+    const pixelId = settings.facebook_pixel_id.trim();
+    
+    try {
+      // Check if fbq is already defined
+      if (typeof window !== 'undefined' && window.fbq) {
+        // If fbq exists, just track the page view without reinitializing
+        window.fbq('track', 'PageView');
         return;
       }
 
-      // Standard Facebook Pixel Base Code
-      void (function (f: any, b, e, v, n, t, s) {
-        if (f.fbq) return;
-        n = f.fbq = function () {
-          n.callMethod
-            ? n.callMethod.apply(n, arguments)
-            : n.queue.push(arguments);
-        };
-        if (!f._fbq) f._fbq = n;
-        n.push = n;
-        n.loaded = !0;
-        n.version = '2.0';
-        n.queue = [];
-        t = b.createElement(e);
-        t.async = !0;
-        t.src = v;
-        t.id = 'facebook-pixel-script'; // Add an ID to easily check its existence
-        s = b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t, s);
-      })(
-        window,
-        document,
-        'script',
-        'https://connect.facebook.net/en_US/fbevents.js'
-      );
-
-      (window as any).fbq('init', pixelId);
-      (window as any).fbq('track', 'PageView');
+      // Initialize Facebook Pixel only if it doesn't exist yet
+      window.fbq = function() {
+        // @ts-ignore
+        window.fbq.callMethod ? window.fbq.callMethod.apply(window.fbq, arguments) : window.fbq.queue.push(arguments);
+      };
+      
+      // Initialize queue if it doesn't exist
+      if (!window._fbq) window._fbq = window.fbq;
+      window.fbq.push = window.fbq;
+      window.fbq.loaded = true;
+      window.fbq.version = '2.0';
+      window.fbq.queue = [];
+      
+      // Create and inject the script element
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+      script.id = 'facebook-pixel-script';
+      document.head.appendChild(script);
+      
+      // Initialize with pixel ID and track page view
+      window.fbq('init', pixelId);
+      window.fbq('track', 'PageView');
+    } catch (error) {
+      // Silently handle any errors to prevent breaking navigation
+      console.error('Facebook Pixel error:', error);
     }
+    
+    // Clean up function
+    return () => {
+      // Nothing to clean up for FB Pixel
+    };
   }, [settings?.facebook_pixel_id]);
 
 
