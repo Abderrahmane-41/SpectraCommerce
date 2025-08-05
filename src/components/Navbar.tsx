@@ -30,7 +30,7 @@ const Navbar = ({ children, isDashboard = false }: NavbarProps) => {
         animate={{ y: 0 }}
         className="fixed top-0 left-0 right-0 z-50 glass-effect"
       >
-        <div className="w-full px-5 sm:px-6 py-3 sm:py-3 md:py-4 flex items-center justify-between">
+        <div className="w-full px-5 sm:px-6 py-2 sm:py-3 md:py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
             <img 
               src={settings?.logo_url || '/favicon.ico'} 

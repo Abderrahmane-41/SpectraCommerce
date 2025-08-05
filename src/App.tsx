@@ -4,22 +4,19 @@ import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from './hooks/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
-import { StoreSettingsProvider } from './contexts/StoreSettingsContext';
+import { StoreSettingsProvider, useStoreSettings } from './contexts/StoreSettingsContext';
 import { HelmetProvider } from 'react-helmet-async';
-import { Suspense, lazy } from 'react'; // ✅ ADD SUSPENSE AND LAZY
 import LoadingSpinner from './components/LoadingSpinner'; // ✅ ADD LOADING COMPONENT
 import AboutUsPage from './pages/AboutUsPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
-
-// ✅ LAZY LOAD ALL PAGES
-const Index = lazy(() => import('./pages/Index'));
-const ProductsPage = lazy(() => import('./pages/ProductsPage'));
-const ProductPage = lazy(() => import('./pages/ProductPage'));
-const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+import Index from './pages/Index';
+import ProductsPage from './pages/ProductsPage';
+import ProductPage from './pages/ProductPage';
+import ConfirmationPage from './pages/ConfirmationPage';
+import Dashboard from './pages/Dashboard';
+import AuthPage from './pages/AuthPage';
+import NotFound from './pages/NotFound';
 
 import './App.css';
 
@@ -34,12 +31,47 @@ const queryClient = new QueryClient({
   },
 });
 
-// ✅ CREATE LOADING FALLBACK COMPONENT
-const PageFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <LoadingSpinner />
-  </div>
-);
+// ✅ INTERNAL APP CONTENT COMPONENT THAT USES STORE SETTINGS
+const AppContent = () => {
+  const { loading } = useStoreSettings();
+
+  // Implement loading gate - don't render main app until settings are loaded
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-background text-foreground">
+        <Routes>
+          <Route path="/" element={<MainLayout><Index /></MainLayout>} />
+          <Route path="/products/:typeId" element={<MainLayout><ProductsPage /></MainLayout>} />
+          <Route path="/products/:typeId/:productId" element={<MainLayout><ProductPage /></MainLayout>} />
+          <Route path="/confirmation" element={<MainLayout><ConfirmationPage /></MainLayout>} />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
+          <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+        </Routes>
+        <Toaster />
+      </div>
+    </Router>
+  );
+};
 
 function App() {
   return (
@@ -47,35 +79,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <StoreSettingsProvider>
-            <Router>
-              <div className="min-h-screen bg-background text-foreground">
-                {/* ✅ WRAP ROUTES IN SUSPENSE */}
-                <Suspense fallback={<PageFallback />}>
-                  <Routes>
-                    <Route path="/" element={<MainLayout><Index /></MainLayout>} />
-                    <Route path="/products/:typeId" element={<MainLayout><ProductsPage /></MainLayout>} />
-                    <Route path="/products/:typeId/:productId" element={<MainLayout><ProductPage /></MainLayout>} />
-                    <Route path="/confirmation" element={<MainLayout><ConfirmationPage /></MainLayout>} />
-
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ProtectedRoute>
-                          <Dashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route path="/auth" element={<AuthPage />} />
-                    <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
-                    <Route path="/about" element={<AboutUsPage />} />
-                    <Route path="/terms" element={<TermsPage />} />
-                    <Route path="/privacy" element={<PrivacyPage />} />
-        
-                  </Routes>
-                </Suspense>
-                <Toaster />
-              </div>
-            </Router>
+            <AppContent />
           </StoreSettingsProvider>
         </AuthProvider>
       </QueryClientProvider>
