@@ -656,6 +656,16 @@ The app is requesting access to sensitive info in your Google Account. Until the
                   15
                 </span>
                 <span>
+                      إن لم تستقبل أي معلومات على الجدول أعد المراحل 7 , 8 , 9 , 10 , 11 , 12 , 13 , 14 بنفس الطريقة وسيعمل الكود . {' '}
+                  
+                    
+                </span>
+              </li>
+              <li className="leading-relaxed flex items-start">
+                <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
+                  16
+                </span>
+                <span>
                       إن لم يعمل الكود شاهد هذا الفيديو لتفهم أكثر{' '}
                   <a 
                     href="https://drive.google.com/file/d/1f7HY0VmIHMX7VLU7ks4wX9ZcGDJCzAu6/view?usp=sharing&t=9" 
