@@ -25,8 +25,12 @@ export interface Product {
   options?: {
     sizes: Array<{ name: string; priceModifier: number }>;
     colors: Array<{ name: string; priceModifier: number }>;
+    customOptions: Array<{ 
+      optionName: string; 
+      values: Array<{ name: string; priceModifier: number }>
+    }>;
   };
-  quantity_offers?: Array<{ quantity: number; price: number }>; // Add this line
+  quantity_offers?: Array<{ quantity: number; price: number; name?: string }>; // Added name field
   description_content?: Array<{ type: 'text' | 'image'; content: string }> | null;
   min_quantity: number;
   max_quantity: number | null;
@@ -44,6 +48,8 @@ export interface OrderData {
   ip_address?: string;
   size: string;
   color: string;
+  custom_options?: Record<string, string>;
+
   quantity: number;
   base_price: number;
   total_price: number;
@@ -76,8 +82,8 @@ export const useProductById = (productId: string) => {
     } else {
       // Transform the data to match our Product interface
       const options = data.options && typeof data.options === 'object' && data.options !== null 
-        ? data.options as { sizes?: Array<{ name: string; priceModifier: number }>; colors?: Array<{ name: string; priceModifier: number }> }
-        : { sizes: [], colors: [] };
+        ? data.options as { sizes?: Array<{ name: string; priceModifier: number }>; colors?: Array<{ name: string; priceModifier: number }> ; customOptions?: Array<{ optionName: string; values: Array<{ name: string; priceModifier: number }> }> }
+        : { sizes: [], colors: [] , customOptions: [] };
 
       // Process description content before setting it
       let parsedDescriptionContent = null;
@@ -102,7 +108,9 @@ export const useProductById = (productId: string) => {
         colors: options.colors?.map((c) => c.name) || [],
         options: {
           sizes: options.sizes || [],
-          colors: options.colors || []
+          colors: options.colors || [],
+          customOptions: options.customOptions || []
+
         },
         quantity_offers: data.quantity_offers ?
           (typeof data.quantity_offers === 'string' ?
@@ -220,6 +228,7 @@ export const useOrders = () => {
       quantity: orderData.quantity,
       size: orderData.size,
       color: orderData.color,
+      custom_options: orderData.custom_options,
       total_price: orderData.total_price,
       status: orderData.status || 'pending',
       ip_address: ipAddress // Add the IP address

@@ -10,11 +10,23 @@ import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { normalizeQuantityOffer, normalizeQuantityOffers } from '@/utils/productUtils';
 
 
 interface ProductOption {
   name: string;
   priceModifier: number;
+}
+interface CustomOption {
+  optionName: string;
+  values: Array<{ name: string; priceModifier: number }>;
+}
+
+// Add this interface near the top of the file
+interface QuantityOffer {
+  quantity: number | string;
+  price: number | string;
+  name?: string; // Added name property
 }
 
 type ContentBlock = {
@@ -35,6 +47,12 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
   const [loading, setLoading] = useState(false);
   const [minQuantity, setMinQuantity] = useState('1');
   const [maxQuantity, setMaxQuantity] = useState('');
+  const [quantityOffers, setQuantityOffers] = useState<QuantityOffer[]>([]);
+  const [offerName, setOfferName] = useState('');
+  const [offerQuantity, setOfferQuantity] = useState('');
+  const [offerPrice, setOfferPrice] = useState('');
+
+
   
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
@@ -45,15 +63,19 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
   const [sizes, setSizes] = useState<ProductOption[]>([]);
   const [colors, setColors] = useState<ProductOption[]>([]);
 
-  const [quantityOffers, setQuantityOffers] = useState<Array<{ quantity: string; price: string }>>([]);
 
   const [descriptionBlocks, setDescriptionBlocks] = useState<ContentBlock[]>([]);
   const { uploadImage, uploading } = useImageUpload(); // Use your existing image upload hook
 
+  // Inside the AddProductModal component, add state for custom options
+const [customOptions, setCustomOptions] = useState<CustomOption[]>([]);
+const [activeCustomOptionIndex, setActiveCustomOptionIndex] = useState<number | null>(null);
+
+
 
   // State for the new options modal
   const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
-  const [optionType, setOptionType] = useState<'size' | 'color'>('size');
+  const [optionType, setOptionType] = useState<'size' | 'color' | 'custom'>('size' );
   const [editingOption, setEditingOption] = useState<{ index: number; data: ProductOption } | null>(null);
 
   useEffect(() => {
@@ -67,12 +89,11 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
       const options = editingProduct.options;
       setSizes(options?.sizes || []);
       setColors(options?.colors || []);
-      setQuantityOffers(
-    editingProduct.quantity_offers?.map((o: { quantity: number; price: number }) => ({
-      quantity: o.quantity.toString(),
-      price: o.price.toString(),
-    })) || []
-  );
+      setCustomOptions(options?.customOptions || []);
+
+      setQuantityOffers(normalizeQuantityOffers(editingProduct.quantity_offers));
+
+
         setMinQuantity(editingProduct.min_quantity?.toString() || '1');
       setMaxQuantity(editingProduct.max_quantity?.toString() || '');
 // Fix description content initialization
@@ -84,8 +105,6 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
 
     } else {
       resetForm();
-      setQuantityOffers([]);
-      setDescriptionBlocks([]); // Add this
       
 
     }
@@ -100,6 +119,8 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
     setImages([]);
     setSizes([]);
     setColors([]);
+    setCustomOptions([]);
+
     setQuantityOffers([]);
     setDescriptionBlocks([]); // Add this line
     setMinQuantity('1');
@@ -108,6 +129,192 @@ const AddProductModal = ({ isOpen, onClose, selectedTypeId, editingProduct }: Ad
 
   };
 
+
+  // Update the addQuantityOffer function
+const addQuantityOffer = () => {
+  const newOffer = {
+    quantity: parseInt(offerQuantity) || 0,
+    price: parseFloat(offerPrice) || 0,
+    name: offerName.trim() || "قطع" // Use the entered name or default to "قطع"
+  };
+  
+  if (newOffer.quantity <= 0) {
+    toast.error('الرجاء إدخال كمية صحيحة');
+    return;
+  }
+  
+  if (newOffer.price <= 0) {
+    toast.error('الرجاء إدخال سعر صحيح');
+    return;
+  }
+  
+  setQuantityOffers([...quantityOffers, newOffer]);
+  setOfferQuantity('');
+  setOfferPrice('');
+  setOfferName(''); // Reset the name field
+};
+
+
+  // Render function for quantity offers section
+const renderQuantityOffers = () => (
+  <div className="mt-4">
+    <div className="flex justify-between items-center">
+      <label className="block text-sm font-medium">عروض الكمية</label>
+    </div>
+    
+    <div className="space-y-3 mt-2">
+      {quantityOffers.map((offer, index) => (
+        <div key={index} className="flex items-center space-x-2 rtl:space-x-reverse bg-muted/50 p-2 rounded-lg">
+          <p className="flex-grow">
+            اشتري <span className="font-semibold">{offer.quantity}</span>{' '}
+            <span>{offer.name || "قطع"}</span> بسعر{' '}
+            <span className="font-semibold">{offer.price}</span> دج 
+          </p>
+          <button
+            type="button"
+            onClick={() => setQuantityOffers(quantityOffers.filter((_, i) => i !== index))}
+            className="p-1 hover:bg-red-100 hover:text-red-500 rounded-full"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
+      
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <input
+            type="number"
+            value={offerQuantity}
+            onChange={(e) => setOfferQuantity(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+            placeholder="الكمية"
+            min="1"
+          />
+        </div>
+        <div>
+          <input
+            type="number"
+            value={offerPrice}
+            onChange={(e) => setOfferPrice(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+            placeholder="السعر  "
+            min="0"
+          />
+        </div>
+        <div>
+          <input
+            type="text"
+            value={offerName}
+            onChange={(e) => setOfferName(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+            placeholder="اسم الوحدة (مثلاً: عبوات، قطع)"
+          />
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={addQuantityOffer}
+          className="flex items-center space-x-1 rtl:space-x-reverse text-primary hover:text-primary/80 text-sm"
+        >
+          <Plus className="w-4 h-4" />
+          <span>إضافة عرض كمية</span>
+        </button>
+      </div>
+    </div>
+  </div>
+);
+  // Add handlers for custom options
+const handleOpenCustomOptionModal = (optionIndex: number | null = null, valueIndex: number | null = null, valueData: ProductOption | null = null) => {
+  setOptionType('custom');
+  setActiveCustomOptionIndex(optionIndex);
+  
+  if (valueIndex !== null && valueData) {
+    setEditingOption({ index: valueIndex, data: valueData });
+  } else {
+    setEditingOption(null);
+  }
+  
+  setIsOptionModalOpen(true);
+};
+
+const handleAddCustomOption = () => {
+  handleOpenCustomOptionModal(null);
+};
+
+
+const handleSaveCustomOption = (option: ProductOption | CustomOption) => {
+  if ('optionName' in option && 'values' in option) {
+    // Adding a new custom option category
+    setCustomOptions([...customOptions, option as CustomOption]);
+  } else if ('optionName' in option) {
+    // Adding a value to an existing custom option
+    const newValue = { 
+      name: (option as any).name, 
+      priceModifier: (option as any).priceModifier 
+    };
+    
+    if (activeCustomOptionIndex !== null) {
+      // Adding to existing option
+      const newOptions = [...customOptions];
+      
+      if (editingOption !== null) {
+        // Editing an existing value
+        newOptions[activeCustomOptionIndex].values[editingOption.index] = newValue;
+      } else {
+        // Adding a new value
+        newOptions[activeCustomOptionIndex].values.push(newValue);
+      }
+      
+      setCustomOptions(newOptions);
+    } else {
+      // Creating new option
+      const newOption: CustomOption = {
+        optionName: (option as any).optionName,
+        values: [{ name: (option as any).name, priceModifier: (option as any).priceModifier }]
+      };
+      setCustomOptions([...customOptions, newOption]);
+    }
+  } else if (optionType === 'size') {
+    // Original size option handling
+    if (editingOption !== null) {
+      const newSizes = [...sizes];
+      newSizes[editingOption.index] = option as ProductOption;
+      setSizes(newSizes);
+    } else {
+      setSizes([...sizes, option as ProductOption]);
+    }
+  } else {
+    // Original color option handling
+    if (editingOption !== null) {
+      const newColors = [...colors];
+      newColors[editingOption.index] = option as ProductOption;
+      setColors(newColors);
+    } else {
+      setColors([...colors, option as ProductOption]);
+    }
+  }
+  
+  setActiveCustomOptionIndex(null);
+  setEditingOption(null);
+};
+
+const removeCustomOptionValue = (optionIndex: number, valueIndex: number) => {
+  const newOptions = [...customOptions];
+  newOptions[optionIndex].values = newOptions[optionIndex].values.filter((_, i) => i !== valueIndex);
+  
+  // Remove the entire custom option if no values remain
+  if (newOptions[optionIndex].values.length === 0) {
+    newOptions.splice(optionIndex, 1);
+  }
+  
+  setCustomOptions(newOptions);
+};
+
+const removeCustomOption = (index: number) => {
+  setCustomOptions(customOptions.filter((_, i) => i !== index));
+};
 
   // In src/components/dashboard/AddProductModal.tsx
 
@@ -152,12 +359,15 @@ const removeBlock = (index: number) => {
 
 // Update your onSubmit function
 
-  // Locate this function
+// Locate this function
 const handleOfferChange = (index: number, field: 'quantity' | 'price', value: string) => {
     const newOffers = [...quantityOffers];
     // Simply store the string value from the input directly.
     // We'll handle numerical conversion and precision on submission.
-    newOffers[index][field] = value;
+    newOffers[index] = {
+      ...newOffers[index],
+      [field]: value
+    };
     setQuantityOffers(newOffers);
 };
 
@@ -280,11 +490,12 @@ const handleSubmit = async (e: React.FormEvent) => {
            };
 
         const formattedQuantityOffers = quantityOffers
-            .filter(o => o.quantity && o.price)
-            .map(o => ({
-                quantity: parseInt(o.quantity, 10), // Quantity is always an integer
-                price: formatPriceForDb(o.price) || 0 // Use the helper for price
-            }));
+      .filter(o => o.quantity && o.price)
+      .map(o => normalizeQuantityOffer({
+        quantity: o.quantity,
+        price: o.price,
+        name: o.name
+      }));
    // Filter out empty description blocks
     const filteredDescriptionBlocks = descriptionBlocks
       .filter(block => block.content && block.content.trim() !== '');
@@ -296,11 +507,11 @@ const handleSubmit = async (e: React.FormEvent) => {
             price_before_discount: formatPriceForDb(priceBeforeDiscount), // Apply helper
             product_type_id: productTypeId,
             images: images.length > 0 ? images : ['/placeholder.svg'],
-            options: { sizes, colors },
+            options: { sizes, colors, customOptions },      
             quantity_offers: formattedQuantityOffers,
             description_content: filteredDescriptionBlocks.length > 0 ? filteredDescriptionBlocks : null,
              min_quantity: minQty,
-        max_quantity: maxQty
+            max_quantity: maxQty
 
         };
 
@@ -323,6 +534,70 @@ const handleSubmit = async (e: React.FormEvent) => {
         setLoading(false);
     }
 };
+
+  // Add a function to render custom options
+const renderCustomOptions = () => (
+  <div className="space-y-4">
+    <div className="flex justify-between items-center">
+      <label className="block text-sm font-medium">خصائص إضافية</label>
+      <button 
+        type="button" 
+        onClick={handleAddCustomOption} 
+        className="flex items-center space-x-1 text-primary hover:text-primary/80 text-sm"
+      >
+        <Plus className="w-4 h-4" />
+        <span>إضافة خاصية</span>
+      </button>
+    </div>
+    
+    {customOptions.map((option, optionIndex) => (
+      <div key={optionIndex} className="p-4 border border-border rounded-lg space-y-3">
+        <div className="flex justify-between items-center">
+          <h4 className="font-medium">{option.optionName}</h4>
+          <button 
+            type="button" 
+            onClick={() => removeCustomOption(optionIndex)}
+            className="p-1 hover:bg-red-100 hover:text-red-500 rounded-full"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          {option.values.map((value, valueIndex) => (
+            <div key={valueIndex} className="flex items-center gap-1 bg-muted/50 rounded-full px-3 py-1 text-sm">
+              <span>{value.name} ({value.priceModifier >= 0 ? '+' : ''}{value.priceModifier} دج)</span>
+              <button 
+                type="button" 
+                onClick={() => handleOpenCustomOptionModal(optionIndex, valueIndex, value)} 
+                className="p-1 hover:text-blue-500 rounded-full"
+              >
+                <Edit className="w-3 h-3" />
+              </button>
+              <button 
+                type="button" 
+                onClick={() => removeCustomOptionValue(optionIndex, valueIndex)} 
+                className="p-1 hover:text-red-500 rounded-full"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+        
+        <button
+          type="button"
+          onClick={() => handleOpenCustomOptionModal(optionIndex)}
+          className="flex items-center text-primary hover:text-primary/80 text-sm mt-2"
+        >
+          <Plus className="w-3 h-3 mr-1" />
+          <span>إضافة قيمة جديدة</span>
+        </button>
+      </div>
+    ))}
+  </div>
+);
+
   if (!isOpen) return null;
 
   const renderOptionsList = (type: 'size' | 'color', options: ProductOption[]) => (
@@ -384,49 +659,11 @@ const handleSubmit = async (e: React.FormEvent) => {
               <input type="number" value={priceBeforeDiscount} onChange={(e) => setPriceBeforeDiscount(e.target.value)} onWheel={preventScrollWheel} className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="3000" min="0" step="0.01" />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">عروض الكمية</label>
-              <div className="space-y-3">
-                {quantityOffers.map((offer, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={offer.quantity}
-                      onChange={(e) => handleOfferChange(index, 'quantity', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      placeholder="الكمية"
-                      min="2"
-                    />
-                    <input
-                      type="number"
-                      value={offer.price}
-                      onChange={(e) => handleOfferChange(index, 'price', e.target.value)}
-                      onWheel={preventScrollWheel}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      placeholder="السعر الإجمالي"
-                      step="0.01"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeOffer(index)}
-                      className="p-2 text-red-500 hover:bg-red-500/50 rounded-lg"
-                    >
-                      <Trash2 className="w-5 h-5 md:w-10 md:h-10" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addOffer}
-                  className="flex items-center space-x-2 text-primary hover:text-primary/80 text-sm font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>إضافة عرض كمية</span>
-                </button>
-              </div>
             </div>
 
-          </div>
+            {renderQuantityOffers()}
+
+          
 
           {/* Inventory Management Section */}
         <div className="grid grid-cols-2 gap-4">
@@ -569,6 +806,8 @@ const handleSubmit = async (e: React.FormEvent) => {
           
           {renderOptionsList('size', sizes)}
           {renderOptionsList('color', colors)}
+          {renderCustomOptions()}
+
 
           <div className="flex space-x-3 pt-4">
             <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted/50" disabled={loading}>إلغاء</button>
@@ -579,12 +818,17 @@ const handleSubmit = async (e: React.FormEvent) => {
     </motion.div>
     
     <ProductOptionModal
-        isOpen={isOptionModalOpen}
-        onClose={() => setIsOptionModalOpen(false)}
-        onSave={handleSaveOption}
-        optionType={optionType}
-        initialData={editingOption?.data || null}
-      />
+  isOpen={isOptionModalOpen}
+  onClose={() => {
+    setIsOptionModalOpen(false);
+    setActiveCustomOptionIndex(null);
+    setEditingOption(null);
+  }}
+  onSave={optionType === 'custom' ? handleSaveCustomOption : handleSaveOption}
+  optionType={optionType}
+  initialData={editingOption?.data || null}
+  existingOptionName={activeCustomOptionIndex !== null ? customOptions[activeCustomOptionIndex].optionName : ''}
+/>
     </>
   );
 };

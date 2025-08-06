@@ -8,45 +8,117 @@ interface ProductOption {
   priceModifier: number;
 }
 
+interface CustomOption {
+  optionName: string;
+  values: Array<{ name: string; priceModifier: number }>;
+}
+
 interface ProductOptionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (option: ProductOption) => void;
-  optionType: 'size' | 'color';
-  initialData?: ProductOption | null;
+  onSave: (option: ProductOption | CustomOption) => void;
+  optionType: 'size' | 'color' | 'custom';
+  initialData?: ProductOption | CustomOption | null;
+  editingCustomOption?: boolean;
+  existingOptionName?: string; // Add this new prop
 }
 
-const ProductOptionModal = ({ isOpen, onClose, onSave, optionType, initialData }: ProductOptionModalProps) => {
+const ProductOptionModal = ({ 
+  isOpen, 
+  onClose, 
+  onSave, 
+  optionType, 
+  initialData, 
+  editingCustomOption = false,
+  existingOptionName = '' // Default to empty string
+}: ProductOptionModalProps) => {
   const [name, setName] = useState('');
   const [priceModifier, setPriceModifier] = useState('');
+  const [optionName, setOptionName] = useState('');
 
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name);
-      setPriceModifier(initialData.priceModifier.toString());
+      if ('values' in initialData) {
+        // It's a custom option
+        setOptionName(initialData.optionName);
+      } else {
+        // It's a regular option (size or color)
+        setName(initialData.name);
+        setPriceModifier(initialData.priceModifier.toString());
+      }
     } else {
       setName('');
       setPriceModifier('');
+      // Only reset optionName if we're not editing an existing option
+      if (!existingOptionName) {
+        setOptionName('');
+      } else {
+        setOptionName(existingOptionName);
+      }
     }
-  }, [initialData]);
+  }, [initialData, editingCustomOption, existingOptionName]);
 
   if (!isOpen) return null;
 
-  const title = `${initialData ? 'تعديل' : 'إضافة'} ${optionType === 'size' ? 'مقاس' : 'لون'}`;
-  const namePlaceholder = optionType === 'size' ? 'مثال: L, XL' : 'مثال: أحمر, أزرق';
+  const namePlaceholder = optionType === 'size' ? 'مثال: L, XL' : 
+                          optionType === 'color' ? 'مثال: أحمر, أزرق' : 
+                          'مثال: خشب, بلاستيك';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Get the final option name - either from input or from the existing name
+    const finalOptionName = existingOptionName || optionName.trim();
+    
+    if (optionType === 'custom' && !finalOptionName) {
+      toast.error('الرجاء إدخال اسم الخاصية');
+      return;
+    }
+    
     if (!name.trim()) {
       toast.error('الرجاء إدخال اسم الخيار');
       return;
     }
-    onSave({
-      name: name.trim(),
-      priceModifier: parseFloat(priceModifier) || 0,
-    });
+    
+    if (optionType === 'custom') {
+      if (editingCustomOption) {
+        // We're editing the whole custom option, not just one value
+        onSave({
+          optionName: finalOptionName,
+          values: [{
+            name: name.trim(),
+            priceModifier: parseFloat(priceModifier) || 0,
+          }]
+        });
+      } else {
+        // We're adding/editing a value within a custom option
+        onSave({
+          name: name.trim(),
+          priceModifier: parseFloat(priceModifier) || 0,
+          optionName: finalOptionName
+        } as any);
+      }
+    } else {
+      // Regular size/color option
+      onSave({
+        name: name.trim(),
+        priceModifier: parseFloat(priceModifier) || 0,
+      });
+    }
     onClose();
   };
+
+  // Determine title based on option type and editing state
+  let title;
+  if (optionType === 'size') {
+    title = `${initialData ? 'تعديل' : 'إضافة'} مقاس`;
+  } else if (optionType === 'color') {
+    title = `${initialData ? 'تعديل' : 'إضافة'} لون`;
+  } else {
+    title = existingOptionName 
+      ? `${initialData ? 'تعديل' : 'إضافة'} قيمة لـ ${existingOptionName}`
+      : `${initialData ? 'تعديل' : 'إضافة'} خاصية مخصصة`;
+  }
 
   return (
     <motion.div
@@ -66,8 +138,27 @@ const ProductOptionModal = ({ isOpen, onClose, onSave, optionType, initialData }
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Only show the option name input if we're creating a new custom option */}
+          {optionType === 'custom' && !existingOptionName && (
+            <div>
+              <label className="block text-sm font-medium mb-2">اسم الخاصية</label>
+              <input
+                type="text"
+                value={optionName}
+                onChange={(e) => setOptionName(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="مثال: المادة, المقاس, النموذج"
+                required
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                اسم الخاصية الذي سيظهر للعملاء (مثل: المادة، النوع، الموديل)
+              </p>
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-medium mb-2">الاسم</label>
+            <label className="block text-sm font-medium mb-2">
+              {optionType === 'custom' ? 'قيمة الخاصية' : 'الاسم'}
+            </label>
             <input
               type="text"
               value={name}

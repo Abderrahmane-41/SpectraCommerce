@@ -256,7 +256,7 @@ function doPost(e) {
         if (sheet.getRange("A1").getValue() === "") {
             const headers = [ 
                 "التاريخ", "نوع المنتج", "اسم المنتج", "الكمية", 
-                "المقاس", "اللون", "السعر الإجمالي", "اسم العميل", 
+                "المقاس", "اللون",   "خيارات إضافية", "السعر الإجمالي", "اسم العميل", 
                 "رقم الهاتف", "الولاية", "البلدية", "العنوان الكامل", "الحالة" 
             ];
             sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
@@ -266,12 +266,20 @@ function doPost(e) {
         
         // Create the row data with proper formatting
         const newRow = [
-            data.created_at || new Date().toLocaleString('ar-DZ'),
+            data.created_at || new Date().toLocaleString('fr-FR', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+    }),
             data.productTypeName || 'غير محدد',
             data.product_name || 'غير محدد',
             data.quantity || 1,
             data.size || 'لا يوجد',
             data.color || 'لا يوجد',
+            data.custom_options || 'لا يوجد',
             data.total_price || '0 DZD',
             data.customer_name || 'غير محدد',
             formatPhoneNumber(data.customer_phone),
@@ -288,13 +296,17 @@ function doPost(e) {
         // Format specific columns to preserve data integrity
         const phoneCell = sheet.getRange(lastRow, 9);
         phoneCell.setNumberFormat('@'); // Text format for phone number
+
+        const customOptionsCell = sheet.getRange(lastRow, 7); // Custom options column
+        customOptionsCell.setNumberFormat('@'); // Text format for custom options
+        customOptionsCell.setHorizontalAlignment('right'); // Right align for Arabic
         
         const addressCell = sheet.getRange(lastRow, 12);
         addressCell.setNumberFormat('@'); // Text format for address
         addressCell.setHorizontalAlignment('right'); // Right align for Arabic
         
         // Set right-to-left text direction for Arabic content columns
-        const arabicColumns = [1, 2, 3, 5, 6, 8, 10, 11, 12, 13];
+        const arabicColumns = [1, 2, 3, 5, 6, 8, 10, 11, 12, 13,14];
         arabicColumns.forEach(col => {
             const cell = sheet.getRange(lastRow, col);
             cell.setHorizontalAlignment('right');
@@ -420,7 +432,7 @@ function doPost(e) {
         if (sheet.getRange("A1").getValue() === "") {
             const headers = [ 
                 "التاريخ", "نوع المنتج", "اسم المنتج", "الكمية", 
-                "المقاس", "اللون", "السعر الإجمالي", "اسم العميل", 
+                "المقاس", "اللون",   "خيارات إضافية", "السعر الإجمالي", "اسم العميل", 
                 "رقم الهاتف", "الولاية", "البلدية", "العنوان الكامل", "الحالة" 
             ];
             sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
@@ -430,12 +442,20 @@ function doPost(e) {
         
         // Create the row data with proper formatting
         const newRow = [
-            data.created_at || new Date().toLocaleString('ar-DZ'),
+            data.created_at || new Date().toLocaleString('fr-FR', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+    }),
             data.productTypeName || 'غير محدد',
             data.product_name || 'غير محدد',
             data.quantity || 1,
             data.size || 'لا يوجد',
             data.color || 'لا يوجد',
+            data.custom_options || 'لا يوجد',
             data.total_price || '0 DZD',
             data.customer_name || 'غير محدد',
             formatPhoneNumber(data.customer_phone),
@@ -452,13 +472,17 @@ function doPost(e) {
         // Format specific columns to preserve data integrity
         const phoneCell = sheet.getRange(lastRow, 9);
         phoneCell.setNumberFormat('@'); // Text format for phone number
+
+        const customOptionsCell = sheet.getRange(lastRow, 7); // Custom options column
+        customOptionsCell.setNumberFormat('@'); // Text format for custom options
+        customOptionsCell.setHorizontalAlignment('right'); // Right align for Arabic
         
         const addressCell = sheet.getRange(lastRow, 12);
         addressCell.setNumberFormat('@'); // Text format for address
         addressCell.setHorizontalAlignment('right'); // Right align for Arabic
         
         // Set right-to-left text direction for Arabic content columns
-        const arabicColumns = [1, 2, 3, 5, 6, 8, 10, 11, 12, 13];
+        const arabicColumns = [1, 2, 3, 5, 6, 8, 10, 11, 12, 13,14];
         arabicColumns.forEach(col => {
             const cell = sheet.getRange(lastRow, col);
             cell.setHorizontalAlignment('right');

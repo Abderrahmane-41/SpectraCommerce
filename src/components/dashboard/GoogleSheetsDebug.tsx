@@ -31,6 +31,7 @@ export function GoogleSheetsDebug() {
       quantity: 1,
       size: 'M',
       color: 'أزرق',
+      custom_options: { النقش: 'نقش تجريبي' }, // Example custom options
       total_price: '1000 DZD',
       customer_name: 'عميل تجريبي',
       customer_phone: '+213123456789',

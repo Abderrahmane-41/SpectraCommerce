@@ -7,6 +7,8 @@ interface OrderDetails {
   quantity: number;
   size: string;
   color: string;
+  custom_options?: Record<string, string>;
+
   total_price: number;
   customer_name: string;
   customer_phone: string;
@@ -71,6 +73,12 @@ const OrderSuccessModal = ({ isOpen, onClose, orderDetails }: OrderSuccessModalP
                   <span className="font-bold ml-auto">{orderDetails.color}</span>
                   <strong className="ml-2"> : اللون</strong>
                     </div> 
+                      {Object.entries(orderDetails.custom_options || {}).map(([name, value]) => (
+                        <div className="flex justify-between items-center" key={name}>
+                          <span className="font-bold ml-auto">{value}</span>
+                          <strong className="ml-2"> : {name}</strong>
+                        </div>
+                      ))}
                         </div>
                     </div>
 

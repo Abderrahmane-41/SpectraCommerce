@@ -22,6 +22,8 @@ export type Database = {
           id: string
           product_name: string
           size: string
+          custom_options?: Json | null // Add this line
+
           status: string | null
           total_price: number
           updated_at: string | null
@@ -45,6 +47,7 @@ export type Database = {
           id?: string
           product_name: string
           size: string
+          custom_options?: Json | null
           status?: string | null
           total_price: number
           updated_at?: string | null
@@ -62,6 +65,7 @@ export type Database = {
           id?: string
           product_name?: string
           size?: string
+          custom_options?: Json | null
           status?: string | null
           total_price?: number
           updated_at?: string | null

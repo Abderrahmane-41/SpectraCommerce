@@ -21,6 +21,7 @@ import HowToOrder from '@/components/HowToOrder.tsx';
 import { optimizeCloudinaryUrl } from '@/utils/imageUtils';
 
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
+import { normalizeQuantityOffers } from '@/utils/productUtils';
 
 
 
@@ -123,6 +124,9 @@ const { settings } = useStoreSettings();
   const { product, loading } = useProductById(productId || '');
   const [dynamicProductPrice, setDynamicProductPrice] = useState(product?.base_price || 0);
 
+  const [customOptionValues, setCustomOptionValues] = useState<Record<string, string>>({});
+
+
   const { shippingData, loading: shippingLoading, error: shippingError } = useShippingData();
   const { addOrder } = useOrders();
   const { reviews, loading: reviewsLoading } = useReviews(productId || '');
@@ -132,27 +136,45 @@ const { settings } = useStoreSettings();
 
     const isOutOfStock = product && product.max_quantity !== null && product.max_quantity <= (product.min_quantity || 1);
 
+    // Add handler for custom option changes
+const handleCustomOptionChange = (optionName: string, value: string) => {
+  setCustomOptionValues({
+    ...customOptionValues,
+    [optionName]: value
+  });
+};
 
-  // Effect to update the dynamic price when options change
-  useEffect(() => {
-    
 
-    if (product) {
-        let currentPrice = product.base_price;
+  // Update useEffect to recalculate price when custom options change
+useEffect(() => {
+  if (product) {
+    let currentPrice = product.base_price;
 
-        const selectedSize = product.options?.sizes?.find(s => s.name === size);
-        if (selectedSize) {
-            currentPrice += selectedSize.priceModifier;
-        }
-
-        const selectedColor = product.options?.colors?.find(c => c.name === color);
-        if (selectedColor) {
-            currentPrice += selectedColor.priceModifier;
-        }
-
-        setDynamicProductPrice(currentPrice);
+    const selectedSize = product.options?.sizes?.find(s => s.name === size);
+    if (selectedSize) {
+      currentPrice += selectedSize.priceModifier;
     }
-  }, [size, color, product]);
+
+    const selectedColor = product.options?.colors?.find(c => c.name === color);
+    if (selectedColor) {
+      currentPrice += selectedColor.priceModifier;
+    }
+    
+    // Add custom options price modifiers
+    if (product.options?.customOptions) {
+      product.options.customOptions.forEach(option => {
+        const selectedValue = option.values.find(
+          v => v.name === customOptionValues[option.optionName]
+        );
+        if (selectedValue) {
+          currentPrice += selectedValue.priceModifier;
+        }
+      });
+    }
+
+    setDynamicProductPrice(currentPrice);
+  }
+}, [size, color, customOptionValues, product]);
 
   // REMOVED explicit ViewContent Event tracking
   // useEffect(() => {
@@ -353,6 +375,16 @@ const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
     const hasSizeOptions = product?.options?.sizes && product.options.sizes.length > 0;
     const hasColorOptions = product?.options?.colors && product.options.colors.length > 0;
 
+
+    // Check if any custom options are required but not selected
+  const hasCustomOptions = product?.options?.customOptions && product.options.customOptions.length > 0;
+  if (hasCustomOptions) {
+    for (const option of product.options.customOptions) {
+      if (option.values.length > 0 && !customOptionValues[option.optionName]) {
+        return toast.error(`الرجاء اختيار ${option.optionName}`);
+      }
+    }
+  }
     if (hasSizeOptions && !size) return toast.error('الرجاء اختيار المقاس');
     if (hasColorOptions && !color) return toast.error('الرجاء اختيار اللون');
 
@@ -369,6 +401,8 @@ const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
         ip_address: ipAddress,
         size: product.options?.sizes?.length > 0 ? size : 'لا يوجد',
         color: product.options?.colors?.length > 0 ? color : 'لا يوجد',
+        custom_options: customOptionValues,
+
         quantity,
         total_price: calculateTotalPrice(),
         customer_name: customerName,
@@ -461,7 +495,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
   return (
     <div className="min-h-screen w-full bg-background">
       <Navbar />
-      <div className="sticky top-12 backdrop-blur-sm border-background p-0 sm:p-10 z-40">
+      <div className="sticky top-16 backdrop-blur-sm border-background pb-0 sm:p-5 z-40">
         <button onClick={() => navigate('/')} className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">الرجوع</span>
@@ -511,24 +545,23 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
             <ProductHeader product={product} reviewsCount={reviews.length} averageRating={averageRating} dynamicPrice={dynamicProductPrice} />
 
 
-            {product.quantity_offers && product.quantity_offers.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-bold mb-2">عروض خاصة</h3>
-              <div className="space-y-2">
-                {product.quantity_offers.sort((a, b) => a.quantity - b.quantity).map((offer, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg">
-                    <p className="font-bold text-lg text-green-600 dark:text-green-400">
-                      {offer.price} DA
-                    </p>
-                    <p className="font-semibold text-green-700 dark:text-green-300">
-                      اشتري {offer.quantity} قطع
-                    </p>
-                    
-                  </div>
-                ))}
+              {product.quantity_offers && product.quantity_offers.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-lg font-bold mb-2">عروض خاصة</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-2">
+                  {normalizeQuantityOffers(product.quantity_offers).map((offer, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 bg-green-300 dark:bg-green-900 rounded-lg flex justify-center items-center"
+                    >
+                      <p className="font-bold text-green-700 dark:text-green-300 text-center w-full">
+                        اشتري {offer.quantity} {offer.name} بسعر {offer.price} دج
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
             
 
@@ -604,6 +637,28 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                           </select>
                         </div>
                       )}
+                      {/* Custom Options */}
+                      {product.options?.customOptions && product.options.customOptions.map((option, index) => (
+                        option.values.length > 0 && (
+                          <div key={index}>
+                            
+                            <select 
+                              id={`custom-option-${index}`}
+                              value={customOptionValues[option.optionName] || ''}
+                              onChange={(e) => handleCustomOptionChange(option.optionName, e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                              required={option.values.length > 0}
+                            >
+                              <option value="">{`اختر ${option.optionName}`}</option>
+                              {option.values.map((value, valueIndex) => (
+                                <option key={valueIndex} value={value.name}>
+                                  {value.name} {value.priceModifier !== 0 ? `(${value.priceModifier > 0 ? '+' : ''}${value.priceModifier} دج)` : ''}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )
+                      ))}
                     </div>
                     <div>
               <label className="block text-xs font-bold mb-1">
