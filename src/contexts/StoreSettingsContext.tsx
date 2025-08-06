@@ -14,7 +14,21 @@ export interface StoreSettings {
   phone_number: string;
   facebook_pixel_id: string; // Added
   google_sheet_api_url?: string | null;
-
+  
+theme_settings?: {
+    backgroundMain: string;
+    backgroundDark: string; // Added for dark mode
+    primaryGradientStart: string;
+    primaryGradientEnd: string;
+  };
+  saved_themes?: Array<{
+    id: string;
+    name: string;
+    backgroundMain: string;
+    backgroundDark: string; // Added for dark mode
+    primaryGradientStart: string;
+    primaryGradientEnd: string;
+  }>;
 }
 
 interface StoreSettingsContextType {
@@ -48,6 +62,29 @@ export const StoreSettingsProvider = ({ children }: { children: ReactNode }) => 
             telegram?: string;
           },
           facebook_pixel_id: data.facebook_pixel_id || '', // Ensure it's a string, default to empty
+          theme_settings: (typeof data.theme_settings === 'object' && data.theme_settings !== null) ? 
+            {
+              backgroundMain: (data.theme_settings as any)?.backgroundMain || '#f7f7f7',
+              backgroundDark: (data.theme_settings as any)?.backgroundDark || '#121212',
+              primaryGradientStart: (data.theme_settings as any)?.primaryGradientStart || '#8A2BE2',
+              primaryGradientEnd: (data.theme_settings as any)?.primaryGradientEnd || '#4682B4'
+            } : {
+              backgroundMain: '#f7f7f7',
+              backgroundDark: '#121212',
+              primaryGradientStart: '#8A2BE2',
+              primaryGradientEnd: '#4682B4'
+            },
+            saved_themes: Array.isArray(data.saved_themes) 
+              ? data.saved_themes.map(theme => ({
+                  id: (theme as any).id || '',
+                  name: (theme as any).name || '',
+                  backgroundMain: (theme as any).backgroundMain || '#f7f7f7',
+                  backgroundDark: (theme as any).backgroundDark || '#121212',
+                  primaryGradientStart: (theme as any).primaryGradientStart || '#8A2BE2',
+                  primaryGradientEnd: (theme as any).primaryGradientEnd || '#4682B4'
+                }))
+              : []
+
         };
         setSettings(formattedSettings);
       }
@@ -80,6 +117,30 @@ export const StoreSettingsProvider = ({ children }: { children: ReactNode }) => 
             facebook_pixel_id: data.facebook_pixel_id || '', // Ensure it's a string, 
             // default to empty
             google_sheet_api_url: data.google_sheet_api_url || null,
+            theme_settings: (typeof data.theme_settings === 'object' && data.theme_settings !== null) ? 
+            {
+              backgroundMain: (data.theme_settings as any)?.backgroundMain || '#f7f7f7',
+              backgroundDark: (data.theme_settings as any)?.backgroundDark || '#121212',
+              primaryGradientStart: (data.theme_settings as any)?.primaryGradientStart || '#8A2BE2',
+              primaryGradientEnd: (data.theme_settings as any)?.primaryGradientEnd || '#4682B4'
+            } : {
+              backgroundMain: '#f7f7f7',
+              backgroundDark: '#121212',
+              primaryGradientStart: '#8A2BE2',
+              primaryGradientEnd: '#4682B4'
+            },
+            saved_themes: Array.isArray(data.saved_themes) 
+              ? data.saved_themes.map(theme => ({
+                  id: (theme as any).id || '',
+                  name: (theme as any).name || '',
+                  backgroundMain: (theme as any).backgroundMain || '#f7f7f7',
+                  backgroundDark: (theme as any).backgroundDark || '#121212',
+                  primaryGradientStart: (theme as any).primaryGradientStart || '#8A2BE2',
+                  primaryGradientEnd: (theme as any).primaryGradientEnd || '#4682B4'
+                }))
+              : []
+
+
         };
         setSettings(formattedSettings);
     }

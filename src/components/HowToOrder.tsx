@@ -1,5 +1,3 @@
-// src/components/HowToOrder.tsx
-
 import { motion } from 'framer-motion';
 import { MousePointerClick, Phone, Truck } from 'lucide-react';
 
@@ -41,7 +39,7 @@ const HowToOrder = () => {
             transition={{ duration: 0.5, delay: index * 0.2 }}
             viewport={{ once: true }}
           >
-            <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark flex items-center justify-center text-white shadow-lg">
+            <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full gradient-icon-bg flex items-center justify-center text-white shadow-lg">
               <step.icon className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div className="flex-1 text-right">

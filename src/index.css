@@ -45,6 +45,15 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+
+     /* New theme variables */
+    --background-main: #f7f7f7;
+    --foreground-main: #333;
+     --background-card: #ffffff;
+    --background-card-dark: #1e1e1e;
+    --primary-gradient-start: #8A2BE2;
+    --primary-gradient-end: #4682B4;
   }
 
   .dark {
@@ -97,8 +106,12 @@
     font-size: 16px;
   }
 
+  .dark body {
+    background-color: var(--background-dark);
+  }
+
   body {
-  @apply bg-gradient-light dark:bg-gradient-dark text-foreground;
+  background-color: var(--background-main);
   font-family: 'Tajawal', sans-serif; /* ✅ Keep only Tajawal */
   /* Remove font-poppins class */
   width: 100%;
@@ -140,16 +153,76 @@
 }
 
 @layer components {
+  
+  body {
+    background-color: var(--background-main);
+  }
+  
+  .dark body {
+    background-color: var(--background-dark);
+  }
   .glass-effect {
-    @apply backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 dark:border-white/10;
+  @apply bg-white/80 dark:bg-black/20 border border-white/20 dark:border-white/10;
   }
   
+  /* Base gradient background that can be used anywhere */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+  }
+  
+  .dark .bg-gradient-primary-dark {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+  }
+
+  /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-primary dark:bg-gradient-primary-dark bg-clip-text text-transparent;
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    @apply bg-clip-text text-transparent;
   }
   
+  /* Gradient button */
   .btn-gradient {
-    @apply bg-gradient-primary dark:bg-gradient-primary-dark text-white font-medium px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-center;
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    @apply text-white font-medium px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-center;
+  }
+  
+  /* Gradient border for cards */
+  .border-gradient {
+    position: relative;
+    border: none;
+    padding: 3px;
+  }
+  
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    z-index: 0;
+  }
+  
+  .border-gradient > * {
+    position: relative;
+    z-index: 1;
+    background: var(--background-main);
+    border-radius: inherit;
+  }
+
+  /* Theme toggle background */
+  .theme-toggle-bg {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+  }
+  
+  /* Gradient icon background for "how to order" cards */
+  .gradient-icon-bg {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+  }
+  
+  /* Tooltip and popover gradient backgrounds */
+  .tooltip-gradient-bg {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    @apply text-white;
   }
   
   .card-hover {
@@ -251,8 +324,13 @@ img {
 /* src/index.css */
 
 /* Add this for your Embla Carousel */
-.embla__slide {
+.hero-carousel .embla__slide {
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.product-type-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* Custom styles for image thumbnail pagination */

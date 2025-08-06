@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { Heart, Check, Users, Trophy, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Heart, Check, Users, Trophy } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -9,7 +8,7 @@ const AboutUsPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="max-w-4xl mx-auto px-4 pt-20 md:pt-20 pb-4 md:pb-8">
+      <main className="max-w-4xl mx-auto px-4 pt-20 md:pt-20 pb-4 md:pb-8 ">
         
 
         {/* Header */}

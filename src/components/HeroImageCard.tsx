@@ -23,6 +23,7 @@ const HeroImageCard = ({ imageUrl, index = 0 }: HeroImageCardProps) => {
           className="w-full h-full object-contain"
           // First hero image should not be lazy loaded, others should
           loading={index === 0 ? "eager" : "lazy"}
+          style={{ filter: "none" }} // Ensure no filter is applied
         />
       </div>
     </div>

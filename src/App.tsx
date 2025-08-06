@@ -17,6 +17,8 @@ import ConfirmationPage from './pages/ConfirmationPage';
 import Dashboard from './pages/Dashboard';
 import AuthPage from './pages/AuthPage';
 import NotFound from './pages/NotFound';
+import ThemeInjector from './components/ThemeInjector ';
+
 
 import './App.css';
 
@@ -78,7 +80,9 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+
           <StoreSettingsProvider>
+            <ThemeInjector />
             <AppContent />
           </StoreSettingsProvider>
         </AuthProvider>

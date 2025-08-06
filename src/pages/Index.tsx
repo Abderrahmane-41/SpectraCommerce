@@ -97,7 +97,7 @@ const Index = () => {
             <motion.h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-8xl font-bold mb-3 sm:mb-4 md:mb-6 gradient-text leading-tight" initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>{settings?.store_name || 'اسم المتجر'} </motion.h1>
             <motion.p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-6 text-muted-foreground max-w-3xl mx-auto leading-relaxed" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>أفضل المنتجات بأفضل الأسعار - التوصيل متوفر 58 ولاية</motion.p>
         </div>
-        <div className="w-full">
+        <div className="w-full hero-carousel">
            <GenericCarousel items={heroImages} slideClassName="w-full"     renderSlide={(image, index) => <HeroImageCard imageUrl={image.url} index={index} />} 
  />
         </div>

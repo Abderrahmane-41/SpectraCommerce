@@ -168,6 +168,8 @@ export type Database = {
           created_at: string
           updated_at: string
           google_sheet_api_url?: string | null // Added
+          theme_settings?: Json | null // Add this line
+          saved_themes?: Json | null // Add this line
         }
         Insert: {
           id?: number
@@ -180,6 +182,9 @@ export type Database = {
           created_at?: string
           updated_at?: string
           google_sheet_api_url?: string | null // Added
+          theme_settings?: Json | null // Add this line
+          saved_themes?: Json | null // Add this line
+
         }
         Update: {
           id?: number
@@ -192,6 +197,9 @@ export type Database = {
           created_at?: string
           updated_at?: string
           google_sheet_api_url?: string | null // Added
+          theme_settings?: Json | null // Add this line
+          saved_themes?: Json | null // Add this line
+
         }
         Relationships: []
       }

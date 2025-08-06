@@ -84,7 +84,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
 
   return (
-    <div className="min-h-screen w-full flex flex-col">
+    <div className="min-h-screen w-full flex flex-col ">
         <Helmet>
         {/* Dynamic Favicon based on store logo */}
               <title>{settings?.store_name || 'متجر الكتروني'}</title>
@@ -109,7 +109,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <meta name="twitter:image" content={settings?.logo_url || '/favicon-32x32.png'} />
       </Helmet>
       <Navbar />
-      <main className="flex-grow">
+      <main className="flex-grow ">
         {children}
       </main>
       <Footer />
