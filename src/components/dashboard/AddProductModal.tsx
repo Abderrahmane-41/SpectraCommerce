@@ -409,9 +409,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <button
                       type="button"
                       onClick={() => removeOffer(index)}
-                      className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg"
+                      className="p-2 text-red-500 hover:bg-red-500/50 rounded-lg"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-5 h-5 md:w-10 md:h-10" />
                     </button>
                   </div>
                 ))}

@@ -170,10 +170,11 @@ const TermsPage = () => {
               </div>
               <div className="space-y-4">
                 <p className="text-foreground">
-                  <span className="font-semibold">المدة:</span> يُسمح بطلب إرجاع أو استبدال المنتجات خلال 7 أيام من تاريخ استلام الطلب.
+                  <span className="font-semibold">المدة:</span>        يُسمح بطلب إرجاع أو استبدال المنتجات خلال 7 أيام من تاريخ استلام الطلب.
+
                 </p>
-                <p className="text-foreground font-semibold">الشروط:</p>
-                <ul className="space-y-2 pr-7">
+                <p className="text-foreground">
+                  <span className="font-semibold"> :الشروط</span>  <ul className="space-y-2 pr-7">
                   <li className="text-foreground">
                     يجب أن يكون المنتج في حالته الأصلية، غير مستخدم، وفي تغليفه الأصلي.
                   </li>
@@ -181,6 +182,8 @@ const TermsPage = () => {
                     يجب إرفاق فاتورة الشراء الأصلية.
                   </li>
                 </ul>
+                </p>
+                
               </div>
             </div>
           </motion.div>

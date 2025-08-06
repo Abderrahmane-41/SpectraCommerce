@@ -59,7 +59,7 @@ const AboutUsPage = () => {
               <Trophy className="h-8 w-8 text-primary mr-3" />
               <h2 className="text-2xl font-bold">مهمتنا</h2>
             </div>
-            <p className="text-foreground leading-relaxed text-justify">
+            <p className="text-foreground  leading-relaxed text-justify">
               مهمتنا بسيطة: أن نكون خيارك الأول والأكثر موثوقية عند البحث عن المنتجات. 
               نحن نؤمن بأن كل عملية شراء هي بداية علاقة، ونسعى لجعل هذه العلاقة مبنية على الرضا التام.
             </p>
@@ -74,7 +74,7 @@ const AboutUsPage = () => {
           className="mb-8 relative p-[0px] rounded-xl"
         >
           <div className="absolute inset-0 rounded-xl bg-gradient-primary dark:bg-gradient-primary-dark opacity-45"></div>
-          <div className="relative glass-effect rounded-xl p-6 md:p-8">
+          <div className="relative glass-effect rounded-xl p-6 md:p-8 ">
             <div className="flex items-center mb-6">
               <Users className="h-8 w-8 text-primary mr-3" />
               <h2 className="text-2xl font-bold">قيمنا</h2>
@@ -85,10 +85,10 @@ const AboutUsPage = () => {
                 <span className="flex-shrink-0 h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center mr-3">
                   <Check className="h-4 w-4 text-primary" />
                 </span>
-                <div>
+                <div className="flex-1 flex flex-col items-center text-center">
                   <h3 className="font-semibold mb-1">الجودة أولاً</h3>
                   <p className="text-muted-foreground text-sm">
-                    نختار كل منتج بعناية فائقة لنضمن أنه يلبي معاييرنا العالية قبل أن يصل إليك.
+                  نختار كل منتج بعناية فائقة لنضمن أنه يلبي معاييرنا العالية قبل أن يصل إليك.
                   </p>
                 </div>
               </li>
@@ -97,7 +97,7 @@ const AboutUsPage = () => {
                 <span className="flex-shrink-0 h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center mr-3">
                   <Check className="h-4 w-4 text-primary" />
                 </span>
-                <div>
+                <div className="flex-1 flex flex-col items-center text-center">
                   <h3 className="font-semibold mb-1">الشفافية المطلقة</h3>
                   <p className="text-muted-foreground text-sm">
                     أسعار واضحة، سياسات سهلة، وتواصل صريح. لا توجد مفاجآت غير سارة معنا.
@@ -109,7 +109,7 @@ const AboutUsPage = () => {
                 <span className="flex-shrink-0 h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center mr-3">
                   <Check className="h-4 w-4 text-primary" />
                 </span>
-                <div>
+                <div className="flex-1 flex flex-col items-center text-center">
                   <h3 className="font-semibold mb-1">خدمة استثنائية</h3>
                   <p className="text-muted-foreground text-sm">
                     فريقنا هنا لمساعدتك في كل خطوة، من الإجابة على استفساراتك إلى ضمان وصول طلبك بأمان.

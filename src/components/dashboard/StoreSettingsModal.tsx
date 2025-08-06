@@ -178,9 +178,9 @@ const StoreSettingsModal = ({ isOpen, onClose }: StoreSettingsModalProps) => {
                   </div>
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex space-x-3 pt-4 justify-evenly" >
                   <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>إلغاء</Button>
-                  <Button type="submit" disabled={isSaving || !!phoneError}>{isSaving ? 'جارٍ الحفظ...' : 'حفظ التغييرات'}</Button>
+                  <Button type="submit" disabled={isSaving || !!phoneError} className="btn-gradient">{isSaving ? 'جارٍ الحفظ...' : 'حفظ التغييرات'}</Button>
                 </div>
             </form>
         )}
