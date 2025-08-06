@@ -152,7 +152,7 @@ export function GoogleSheetSettingsTab() {
           <CardHeader>
             <CardTitle className="text-right gradient-text text-xl font-bold mb-0">
               تعليمات الإعداد<a 
-                    href="https://drive.google.com/file/d/1f7HY0VmIHMX7VLU7ks4wX9ZcGDJCzAu6/view?usp=sharing&t=9" 
+                    href="https://drive.google.com/file/d/1IUdRwl6AOPSu6TM3zHDcmny00UuKgWix/view?usp=sharing" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
@@ -668,7 +668,7 @@ The app is requesting access to sensitive info in your Google Account. Until the
                 <span>
                       إن لم يعمل الكود شاهد هذا الفيديو لتفهم أكثر{' '}
                   <a 
-                    href="https://drive.google.com/file/d/1f7HY0VmIHMX7VLU7ks4wX9ZcGDJCzAu6/view?usp=sharing&t=9" 
+                    href="https://drive.google.com/file/d/1IUdRwl6AOPSu6TM3zHDcmny00UuKgWix/view?usp=sharing" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
