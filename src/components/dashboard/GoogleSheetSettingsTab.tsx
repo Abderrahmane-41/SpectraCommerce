@@ -590,10 +590,39 @@ function doPost(e) {
                   {' '}واتبع التعليمات للسماح للكود بالعمل.
                 </span>
               </li>
-              
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
                   11
+                </span>
+                <span>
+                    إذا أتتك رسالة تحذيرية من غوغل بها{' '}
+                  <code className="bg-primary/10 text-primary px-2 py-1 rounded text-sm font-mono">
+                    Google hasn’t verified this app
+The app is requesting access to sensitive info in your Google Account. Until the developer example_email@gmail.com verifies this app with Google, you shouldn't use it
+                  </code>
+                    انقر على{' '}
+                  <code className="bg-primary/10 text-primary px-2 py-1 rounded text-sm font-mono">
+                    Advanced
+                  </code>
+                  
+                </span>
+              </li>
+              <li className="leading-relaxed flex items-start">
+                <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
+                  12
+                </span>
+                <span>
+                  ثم انقر على{' '}
+                  <code className="bg-primary/10 text-primary px-2 py-1 rounded text-sm font-mono">
+                    Go to Untitled project (unsafe)
+                  </code>
+                  ثم أكمل التعليمات للسماح للكود بالعمل
+                  
+                </span>
+              </li>
+              <li className="leading-relaxed flex items-start">
+                <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
+                  13
                 </span>
                 <span>
                   بعد النشر، انسخ{' '}
@@ -605,11 +634,12 @@ function doPost(e) {
                   <code className="bg-primary/10 text-primary px-2 py-1 rounded text-sm font-mono">
                     Done
                   </code>
+                  
                 </span>
               </li>
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
-                  12
+                  14
                 </span>
                 <span>
                     إختبر الإتصال عبر{' '}
@@ -623,7 +653,7 @@ function doPost(e) {
               </li>
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
-                  13
+                  15
                 </span>
                 <span>
                       إن لم يعمل الكود شاهد هذا الفيديو لتفهم أكثر{' '}

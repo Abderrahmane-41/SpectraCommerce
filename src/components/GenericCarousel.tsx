@@ -39,13 +39,13 @@ const GenericCarousel = <T extends { id: string | number }>({
   }, [emblaApi]);
 
   const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    const styles = emblaApi.slideNodes().map((_slideNode, index) => {
-      if (!emblaApi.slidesInView().includes(index)) return { opacity: 0.5, transform: 'scale(0.85)' };
-      return { opacity: 1, transform: 'scale(1)' };
-    });
-    setSlideStyles(styles);
-  }, [emblaApi]);
+  if (!emblaApi) return;
+  // Modified to always set opacity: 1 and transform: scale(1) for all slides
+  const styles = emblaApi.slideNodes().map(() => {
+    return { opacity: 1, transform: 'scale(1)' };
+  });
+  setSlideStyles(styles);
+}, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
