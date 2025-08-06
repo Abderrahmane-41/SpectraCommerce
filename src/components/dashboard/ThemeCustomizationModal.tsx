@@ -749,7 +749,7 @@ const handleApplyToWebsite = async (themeIndex: number) => {
                                 e.stopPropagation();
                                 handleRenameTheme();
                               }}
-                              className="ml-0 p-1 rounded hover:bg-muted"
+                              className="ml-0 p-2 rounded hover:bg-muted"
                             >
                               <Check className="w-5 h-5 text-green-500" />
                             </button>
