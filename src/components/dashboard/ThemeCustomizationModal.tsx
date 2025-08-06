@@ -686,7 +686,7 @@ const handleApplyToWebsite = async (themeIndex: number) => {
             <div className="p-4 rounded-lg relative">
               <div id="preview-gradient-border" className="absolute inset-0 rounded-lg bg-gradient-primary"></div>
               <div className="relative bg-white p-4 rounded-lg z-10 m-[2px]">
-                <p>محتوى البطاقة</p>
+                <p className='text-black'>محتوى البطاقة</p>
               </div>
             </div>
           </div>
@@ -883,15 +883,15 @@ const handleApplyToWebsite = async (themeIndex: number) => {
 
           {/* Actions */}
           <div className="flex justify-between pt-4">
-            <Button onClick={handleReset} variant="outline" className="flex items-center">
-              <RotateCcw className="w-4 h-4 mr-0" />
+            <Button onClick={handleReset} variant="outline" className="flex items-center p-2">
+              <RotateCcw className="w-3.5 h-3.5 mr-0" />
               إعادة تعيين
             </Button>
-            <div className="flex space-x-3 rtl:space-x-reverse">
-              <Button onClick={onClose} variant="outline" disabled={isSaving}>
+            <div className="flex space-x-0.5 rtl:space-x-reverse justify-between">
+              <Button onClick={onClose} variant="outline" disabled={isSaving} className='p-2'>
                 إلغاء
               </Button>
-              <Button onClick={handleSave} disabled={isSaving} className="btn-gradient">
+              <Button onClick={handleSave} disabled={isSaving} className="btn-gradient p-4">
                 {isSaving ? '...جارٍ الحفظ' : 'حفظ التغييرات'}
               </Button>
             </div>
