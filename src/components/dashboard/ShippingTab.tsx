@@ -39,7 +39,7 @@ const EditForm = React.memo(({
   handleCancel
 }: EditFormProps) => (
   <div className="p-6 space-y-6">
-    <DialogTitle className="text-xl font-bold">
+    <DialogTitle className="text-xl font-bold text-foreground placeholder:text-muted-foreground">
       تعديل معلومات الشحن: {editingWilaya}
     </DialogTitle>
     
@@ -50,7 +50,7 @@ const EditForm = React.memo(({
           type="number"
           value={editingPrice}
           onChange={(e) => setEditingPrice(e.target.value)}
-          className="w-full h-12 bg-background border border-border rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/50 outline-none"
+          className="w-full h-12 bg-background border border-border rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/50 outline-none text-foreground placeholder:text-muted-foreground"
           min="0"
           step="0.01"
         />
@@ -62,7 +62,7 @@ const EditForm = React.memo(({
           type="number"
           value={editingHomePrice}
           onChange={(e) => setEditingHomePrice(e.target.value)}
-          className="w-full h-12 bg-background border border-border rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/50 outline-none"
+          className="w-full h-12 bg-background border border-border rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/50 outline-none text-foreground placeholder:text-muted-foreground"
           min="0"
           step="0.01"
           placeholder="سعر التوصيل للمنزل"
@@ -74,7 +74,7 @@ const EditForm = React.memo(({
         <textarea
           value={editingCommunes}
           onChange={(e) => setEditingCommunes(e.target.value)}
-          className="w-full min-h-[120px] bg-background border border-border rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/50 outline-none"
+          className="w-full min-h-[120px] bg-background border border-border rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/50 outline-none text-foreground placeholder:text-muted-foreground"
           placeholder="بلدية1، بلدية2، ..."
         />
       </div>
@@ -98,8 +98,8 @@ const EditForm = React.memo(({
         whileTap={{ scale: 0.98 }}
         type="button"
       >
-        <X className="w-4 h-4" />
-        <span>إلغاء</span>
+        <X className="w-4 h-4 text-foreground placeholder:text-muted-foreground" />
+        <span className='text-foreground placeholder:text-muted-foreground'>إلغاء</span>
       </motion.button>
     </div>
   </div>
