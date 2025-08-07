@@ -1,7 +1,7 @@
 // src/pages/Dashboard.tsx
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, ShoppingCart, Package, Settings as SettingsIcon, Truck, BarChart } from 'lucide-react'; // Using BarChart instead of Pixel
+import { Menu, ShoppingCart, Package, Settings as SettingsIcon, Truck, BarChart, MessageCircle } from 'lucide-react'; // Using BarChart instead of Pixel
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import OrdersTab from '../components/dashboard/OrdersTab';
 import ProductsTab from '../components/dashboard/ProductsTab';
@@ -9,6 +9,8 @@ import ShippingTab from '../components/dashboard/ShippingTab';
 import PasswordResetModal from '../components/dashboard/PasswordResetModal';
 import SettingsTab from '../components/dashboard/SettingsTab';
 import FacebookPixelSettingsTab from '../components/dashboard/FacebookPixelSettingsTab'; // Import new component
+import TelegramNotificationsTab from '../components/dashboard/TelegramNotificationsTab'; // Import the new component
+
 import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -94,7 +96,7 @@ const Dashboard = () => {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="hidden sm:grid w-full grid-cols-6"> {/* Changed to grid-cols-5 */}
+              <TabsList className="hidden sm:grid w-full grid-cols-7"> {/* Changed to grid-cols-5 */}
                 <TabsTrigger value="orders" className="flex items-center space-x-1 sm:space-x-2">
                   <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="text-xs sm:text-sm">الطلبات</span>
@@ -115,9 +117,13 @@ const Dashboard = () => {
                  <BarChart className="w-3 h-3 sm:w-4 sm:h-4" />
                  <span className="text-xs sm:text-sm">تتبع لبيكسل فيسبوك</span>
                 </TabsTrigger>
-                <TabsTrigger value="google-sheets" className="flex items-center space-x-1 sm:space-x-2">
-                 <SettingsIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                 <span className="text-xs sm:text-sm">Google sheet </span>
+                          <TabsTrigger value="telegram-notifications" className="flex items-center space-x-1 sm:space-x-2">
+            <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="text-xs sm:text-sm">إشعارات تيليجرام</span>
+          </TabsTrigger>
+                          <TabsTrigger value="google-sheets" className="flex items-center space-x-1 sm:space-x-2">
+                          <SettingsIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="text-xs sm:text-sm">Google sheet </span>
                 </TabsTrigger>
               </TabsList>
 
@@ -138,6 +144,9 @@ const Dashboard = () => {
               <TabsContent value="facebook-pixel" className="mt-4 sm:mt-6"> {/* New content */}
                 <FacebookPixelSettingsTab />
               </TabsContent>
+              <TabsContent value="telegram-notifications" className="mt-4 sm:mt-6">
+  <TelegramNotificationsTab />
+</TabsContent>
 
               <TabsContent value="google-sheets" className="mt-4 sm:mt-6"> 
                 <GoogleSheetSettingsTab />

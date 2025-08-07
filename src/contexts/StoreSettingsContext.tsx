@@ -29,6 +29,7 @@ theme_settings?: {
     primaryGradientStart: string;
     primaryGradientEnd: string;
   }>;
+  telegram_chat_id?: string | null; // New field for Telegram notifications
 }
 
 interface StoreSettingsContextType {
@@ -83,7 +84,8 @@ export const StoreSettingsProvider = ({ children }: { children: ReactNode }) => 
                   primaryGradientStart: (theme as any).primaryGradientStart || '#8A2BE2',
                   primaryGradientEnd: (theme as any).primaryGradientEnd || '#4682B4'
                 }))
-              : []
+              : [],
+              telegram_chat_id: data.telegram_chat_id || null // Ensure it's a string or null
 
         };
         setSettings(formattedSettings);
@@ -138,7 +140,8 @@ export const StoreSettingsProvider = ({ children }: { children: ReactNode }) => 
                   primaryGradientStart: (theme as any).primaryGradientStart || '#8A2BE2',
                   primaryGradientEnd: (theme as any).primaryGradientEnd || '#4682B4'
                 }))
-              : []
+              : [],
+            telegram_chat_id: data.telegram_chat_id || null // Ensure it's a string or null
 
 
         };

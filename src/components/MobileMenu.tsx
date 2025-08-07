@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { X, Home, ShoppingCart, Package, Settings, Key, LogOut, Truck, Webhook, Info, FileText, Shield } from 'lucide-react';
+import { X, Home, ShoppingCart, Package, Settings, Key, LogOut, Truck, Webhook, Info, FileText, Shield , MessageCircle} from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
@@ -131,6 +131,12 @@ const dashboardMenuItems: MenuItem[] = [
     tab: 'facebook-pixel',
     type: 'tab'
   },
+  {
+  icon: MessageCircle,
+  label: 'إشعارات تيليجرام',
+  tab: 'telegram-notifications',
+  type: 'tab'
+},
   {
     icon: Settings,
     label: 'Google sheet',

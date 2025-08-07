@@ -174,6 +174,8 @@ export type Database = {
           google_sheet_api_url?: string | null // Added
           theme_settings?: Json | null // Add this line
           saved_themes?: Json | null // Add this line
+          telegram_chat_id?: string | null // Add new field for Telegram notifications
+
         }
         Insert: {
           id?: number
@@ -188,7 +190,7 @@ export type Database = {
           google_sheet_api_url?: string | null // Added
           theme_settings?: Json | null // Add this line
           saved_themes?: Json | null // Add this line
-
+          telegram_chat_id?: string | null // Add new field for Telegram notifications
         }
         Update: {
           id?: number
@@ -203,7 +205,7 @@ export type Database = {
           google_sheet_api_url?: string | null // Added
           theme_settings?: Json | null // Add this line
           saved_themes?: Json | null // Add this line
-
+          telegram_chat_id?: string | null // Add new field for Telegram notifications
         }
         Relationships: []
       }
