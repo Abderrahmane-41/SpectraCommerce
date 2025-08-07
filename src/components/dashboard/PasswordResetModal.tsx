@@ -84,7 +84,7 @@ const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps) => {
           <Button onClick={handleSendResetLink} disabled={isLoading} className="flex-1">
             {isLoading ? 'جارٍ الإرسال...' : 'إرسال رابط إعادة التعيين'}
           </Button>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
+          <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading} className='text-foreground placeholder:text-muted-foreground'>
             إلغاء
           </Button>
         </div>
