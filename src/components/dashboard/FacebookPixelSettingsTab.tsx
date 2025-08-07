@@ -18,7 +18,7 @@ const FacebookPixelSettingsTab = () => {
   const [isValid, setIsValid] = useState(false);
   
   // Check if there's a valid change
-  const hasValidChanges = isValid && pixelId !== originalPixelId && pixelId.trim() !== '';
+  const hasValidChanges = isValid && pixelId !== originalPixelId ;
 
   // Validate the pixel ID format
   const validatePixelId = (id: string) => {

@@ -18,7 +18,7 @@ const TelegramNotificationsTab = () => {
   const [isValid, setIsValid] = useState(false);
   
   // Check if there's a valid change
-  const hasValidChanges = isValid && chatId !== originalChatId && chatId.trim() !== '';
+  const hasValidChanges = isValid && chatId !== originalChatId;
 
   // Validate the chat ID format
   const validateChatId = (id: string) => {

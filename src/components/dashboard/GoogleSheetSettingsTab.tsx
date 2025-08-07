@@ -31,7 +31,6 @@ export function GoogleSheetSettingsTab() {
   // Check if URL has changed and is valid
   const hasValidChanges = () => {
     return googleSheetApiUrl !== initialUrl && 
-           googleSheetApiUrl.trim() !== '' && 
            isValidGoogleSheetsUrl(googleSheetApiUrl);
   };
 
