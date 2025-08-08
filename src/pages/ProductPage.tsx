@@ -12,6 +12,8 @@ import Navbar from '../components/Navbar';
 import { Checkbox } from '../components/ui/checkbox';
 import { toast } from 'sonner';
 import useEmblaCarousel from 'embla-carousel-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+
 import { getClientIp } from '../hooks/useProductData.ts';
 import OrderSuccessModal from '../components/OrderSuccessModal';
 import { Button } from '../components/ui/button';
@@ -515,7 +517,7 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
 
           <motion.div className="space-y-6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+            <motion.div className="relative" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
             
             <div ref={emblaRef} className="overflow-hidden">
               <div className="flex">
@@ -530,6 +532,27 @@ const orderedAvailableWilayas = ALGERIAN_WILAYAS_ORDERED_58.filter(wilayaName =>
                 ))}
               </div>
             </div>
+
+                 {/* Navigation Buttons */}
+            {product.images && product.images.length > 1 && (
+              <>
+                <button
+                  aria-label="Previous image"
+                  onClick={() => emblaApi?.scrollPrev()}
+                  className="absolute top-1/2 -translate-y-1/2 left-2 z-10 p-2 bg-background/60 text-foreground rounded-full shadow-lg transition-opacity duration-300 hover:bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+                <button
+                  aria-label="Next image"
+                  onClick={() => emblaApi?.scrollNext()}
+                  className="absolute top-1/2 -translate-y-1/2 right-2 z-10 p-2 bg-background/60 text-foreground rounded-full shadow-lg transition-opacity duration-300 hover:bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </>
+            )}
+
             {product.images && product.images.length > 1 && (
               <ImageGalleryPagination
                 images={product.images}

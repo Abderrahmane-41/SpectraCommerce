@@ -1,19 +1,15 @@
-// src/components/GenericCarousel.tsx
-
 import React, { useState, useEffect, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils'; // Make sure cn is imported from your utils
-import Autoplay from 'embla-carousel-autoplay'; // Import Autoplay plugin
-
+import { cn } from '@/lib/utils';
+import Autoplay from 'embla-carousel-autoplay';
+import { ChevronLeft, ChevronRight } from 'lucide-react'; // Import arrow icons
 
 // Define the shape of your props
 interface GenericCarouselProps<T> {
   items: T[];
   renderSlide: (item: T, index?: number) => React.ReactNode;
-  // This new optional prop will control the slide width
   slideClassName?: string; 
-  // Optional prop to enable/disable autoplay and customize delay
   autoplay?: boolean;
   autoplayDelay?: number;
 }
@@ -21,13 +17,12 @@ interface GenericCarouselProps<T> {
 const GenericCarousel = <T extends { id: string | number }>({ 
   items, 
   renderSlide, 
-  // Set a default value for the new prop
   slideClassName = "w-3/4 sm:w-1/2 md:w-2/5 lg:w-1/3" ,
-  autoplay = true, // Default to true for hero images
-  autoplayDelay = 7000 // Default to 5 seconds
+  autoplay = true,
+  autoplayDelay = 10000
 }: GenericCarouselProps<T>) => {
+  // Reverted to the original options, removing speed and dragFree overrides
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center' },
-    // Add Autoplay plugin if autoplay is enabled
     autoplay ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: false })] : []);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [slideStyles, setSlideStyles] = useState<(React.CSSProperties | undefined)[]>([]);
@@ -39,13 +34,12 @@ const GenericCarousel = <T extends { id: string | number }>({
   }, [emblaApi]);
 
   const onSelect = useCallback(() => {
-  if (!emblaApi) return;
-  // Modified to always set opacity: 1 and transform: scale(1) for all slides
-  const styles = emblaApi.slideNodes().map(() => {
-    return { opacity: 1, transform: 'scale(1)' };
-  });
-  setSlideStyles(styles);
-}, [emblaApi]);
+    if (!emblaApi) return;
+    const styles = emblaApi.slideNodes().map(() => {
+      return { opacity: 1, transform: 'scale(1)' };
+    });
+    setSlideStyles(styles);
+  }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -54,16 +48,16 @@ const GenericCarousel = <T extends { id: string | number }>({
     emblaApi.on('scroll', onScroll);
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    // All wheel event logic has been removed.
   }, [emblaApi, onScroll, onSelect]);
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative group">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex -ml-4">
           {items.map((item, index) => (
             <motion.div
               key={item.id}
-              // The cn utility now correctly combines the default classes with the prop
               className={cn(
                 "flex-shrink-0 min-w-0 pl-4",
                 slideClassName
@@ -71,13 +65,29 @@ const GenericCarousel = <T extends { id: string | number }>({
               style={slideStyles[index]}
               transition={{ type: 'spring', stiffness: 200, damping: 30 }}
             >
-            {typeof renderSlide === 'function' ? renderSlide(item, index) : null}
-
+              {typeof renderSlide === 'function' ? renderSlide(item, index) : null}
             </motion.div>
           ))}
         </div>
       </div>
 
+      {/* Left Arrow Button */}
+      <button
+        aria-label="Previous slide"
+        onClick={() => emblaApi?.scrollPrev()}
+        className="absolute top-1/2 -translate-y-1/2 left-2 z-10 p-2 bg-background/60 text-foreground rounded-full shadow-lg transition-opacity duration-300 hover:bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+      </button>
+
+      {/* Right Arrow Button */}
+      <button
+        aria-label="Next slide"
+        onClick={() => emblaApi?.scrollNext()}
+        className="absolute top-1/2 -translate-y-1/2 right-2 z-10 p-2 bg-background/60 text-foreground rounded-full shadow-lg transition-opacity duration-300 hover:bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+      </button>
       
       {!window.location.pathname.includes('/product') && (
         <div className="w-48 h-1 bg-muted rounded-full mx-auto mt-8 sm:mt-12">
