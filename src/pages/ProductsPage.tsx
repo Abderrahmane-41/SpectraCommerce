@@ -11,9 +11,13 @@ import { useMemo, useState, useEffect ,useRef} from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
+import { useStoreSettings } from '@/contexts/StoreSettingsContext';
+
 
 const ProductsPage = () => {
     const { typeId = '' } = useParams();
+    const { settings } = useStoreSettings();
+
     const navigate = useNavigate();
     const { products, loading: productsLoading } = useProducts(typeId);
     const { productTypes, loading: typesLoading } = useProductTypes();
@@ -58,16 +62,34 @@ const ProductsPage = () => {
         setDisplayCount(initialDisplay > 0 ? initialDisplay : Math.min(filteredProducts.length, 4));
     }, [filteredProducts]);
 
+
     
+
+    
+
     const scrollToHowToOrder = () => {
     howToOrderRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
     const currentProductType = productTypes.find(type => type.id === typeId);
 
+    useEffect(() => {
+  if (window.fbq && settings?.facebook_pixel_id && currentProductType) {
+    // Track ViewCategory event when a product category is viewed
+    window.fbq('track', 'ViewCategory', {
+      content_category: currentProductType?.name || '',
+      content_ids: productsForType.map(p => p.id),
+      content_name: currentProductType?.name || '',
+      content_type: 'product_group'
+    });
+  }
+}, [currentProductType, productsForType, settings?.facebook_pixel_id]);
+
     if (productsLoading || typesLoading) {
         return <LoadingSpinner />;
     }
+
+    
 
     return (
         <div className="min-h-screen w-full overflow-x-hidden">

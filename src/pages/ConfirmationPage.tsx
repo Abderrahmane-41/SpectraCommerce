@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import StarRating from '../components/StarRating';
 import { useReviews } from '../hooks/useProductData';
 import { toast } from 'sonner';
+import { useStoreSettings } from '@/contexts/StoreSettingsContext';
+
 
 const ConfirmationPage = () => {
   const location = useLocation();
@@ -25,6 +27,8 @@ const ConfirmationPage = () => {
   const [reviewerName, setReviewerName] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const { settings } = useStoreSettings();
+
 
   const { reviews, addReview } = useReviews(productId || '');
 
@@ -36,17 +40,19 @@ const ConfirmationPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // REMOVED explicit Purchase Event tracking
-  // useEffect(() => {
-  //   if (orderValue && (window as any).fbq) {
-  //     (window as any).fbq('track', 'Purchase', {
-  //       value: orderValue,
-  //       currency: orderCurrency,
-  //       content_ids: orderContentIds,
-  //       num_items: orderNumItems
-  //     });
-  //   }
-  // }, [orderValue, orderCurrency, orderContentIds, orderNumItems]);
+  useEffect(() => {
+  // Track Purchase event when confirmation page loads
+  if (window.fbq && settings?.facebook_pixel_id && productId) {
+    // We need to pass basic purchase information
+    window.fbq('track', 'Purchase', {
+      content_ids: [productId],
+      content_name: productName,
+      value: orderValue || 0, // Use default value if not provided
+      currency: 'DZD',
+      num_items: orderNumItems || 1 // Use default if not provided
+    });
+  }
+}, [productId, productName, orderValue, orderNumItems, settings?.facebook_pixel_id]);
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,15 +79,14 @@ const ConfirmationPage = () => {
       setReviewerName('');
       toast.success('تم إرسال التقييم بنجاح!');
 
-      // REMOVED explicit Custom Review Event tracking
-      // if ((window as any).fbq) {
-      //   (window as any).fbq('trackCustom', 'Review', {
-      //     product_id: productId,
-      //     rating: rating,
-      //     comment_length: comment.length,
-      //     reviewer_name_provided: !!reviewerName
-      //   });
-      // }
+       if (window.fbq && settings?.facebook_pixel_id) {
+          window.fbq('trackCustom', 'Review', {
+           product_id: productId,
+           rating: rating,
+           comment_length: comment.length,
+           reviewer_name_provided: !!reviewerName
+         });
+       }
 
     } catch (error) {
       toast.error('فشل في إرسال التقييم');

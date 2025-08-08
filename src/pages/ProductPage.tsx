@@ -178,18 +178,19 @@ useEffect(() => {
   }
 }, [size, color, customOptionValues, product]);
 
-  // REMOVED explicit ViewContent Event tracking
-  // useEffect(() => {
-  //   if (product && (window as any).fbq) {
-  //     (window as any).fbq('track', 'ViewContent', {
-  //       content_name: product.name,
-  //       content_category: product.product_type_id,
-  //       content_ids: [product.id],
-  //       value: product.base_price,
-  //       currency: 'DZD'
-  //     });
-  //   }
-  // }, [product]);
+  useEffect(() => {
+  if (product && window.fbq && settings?.facebook_pixel_id) {
+    // Track ViewContent event when a product is viewed
+    window.fbq('track', 'ViewContent', {
+      content_name: product.name,
+      content_category: product.product_type_id,
+      content_ids: [product.id],
+      content_type: 'product',
+      value: dynamicProductPrice,
+      currency: 'DZD'
+    });
+  }
+}, [product, dynamicProductPrice, settings?.facebook_pixel_id]);
 
   const scrollToHowToOrder = () => {
     howToOrderRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -373,6 +374,23 @@ const shouldShowUpsaleMoreButton = upsaleDisplayCount < upsaleProducts.length;
     if (!validateAlgerianPhone(customerPhone)) return toast.error('رقم الهاتف غير صحيح، يجب أن يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام');
     if (!wilaya.trim()) return toast.error('الرجاء اختيار الولاية');
     if (shipToHome && !commune.trim()) return toast.error('الرجاء اختيار البلدية للتوصيل المنزلي');
+
+    // Track AddToCart event
+  if (window.fbq && settings?.facebook_pixel_id && product) {
+    window.fbq('track', 'AddToCart', {
+      content_name: product.name,
+      content_category: product.product_type_id,
+      content_ids: [product.id],
+      content_type: 'product',
+      value: calculateTotalPrice(),
+      currency: 'DZD',
+      contents: [{
+        id: product.id,
+        quantity: quantity,
+        price: dynamicProductPrice
+      }]
+    });
+  }
 
     const hasSizeOptions = product?.options?.sizes && product.options.sizes.length > 0;
     const hasColorOptions = product?.options?.colors && product.options.colors.length > 0;

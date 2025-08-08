@@ -49,9 +49,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       }
 
       // Initialize Facebook Pixel only if it doesn't exist yet
-      window.fbq = function() {
-        // @ts-ignore
-        window.fbq.callMethod ? window.fbq.callMethod.apply(window.fbq, arguments) : window.fbq.queue.push(arguments);
+      window.fbq = function(...args) {
+        return window.fbq.callMethod ? window.fbq.callMethod(...args) : window.fbq.queue.push(args);
       };
       
       // Initialize queue if it doesn't exist
