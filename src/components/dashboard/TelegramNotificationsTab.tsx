@@ -168,14 +168,14 @@ const TelegramNotificationsTab = () => {
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
                   1
                 </span>
-                <span>افتح تطبيق تيليجرام وابحث عن البوت <strong>@Smart_Web_41_Bot</strong></span>
+                <span>افتح تطبيق تيليجرام وابحث عن البوت <strong>Smart_Web_41_Bot@</strong></span>
               </li>
               
               <li className="leading-relaxed flex items-start">
                 <span className="inline-block w-6 h-6 rounded-full bg-gradient-primary dark:bg-gradient-primary-dark text-white text-sm flex items-center justify-center ml-3 mt-0.5 flex-shrink-0">
                   2
                 </span>
-                <span>ابدأ محادثة مع البوت بإرسال الرسالة <code>id/</code></span>
+                <span>ابدأ محادثة مع البوت بإرسال الرسالة <code>start/</code></span>
               </li>
               
               <li className="leading-relaxed flex items-start">
@@ -209,7 +209,7 @@ const TelegramNotificationsTab = () => {
             <div className="mt-6 p-4 glass-effect bg-primary/5 border border-primary/20 rounded-lg">
               <h4 className="font-semibold text-primary mb-2">💡 نصيحة مهمة</h4>
               <p className="text-sm text-foreground font-medium">
-                بعد إضافة معرف المحادثة، استخدم زر "اختبار الإشعارات" في الأعلى للتأكد من صحة الإعدادات وأنك ستتلقى الإشعارات عند وصول طلبات جديدة.
+                بعد إضافة معرف المحادثة، ستتمكن من متابعة متجرك حتى خارج الموقع و ستتلقى الإشعارات عند وصول طلبات جديدة.
               </p>
             </div>
           </CardContent>
